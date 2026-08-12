@@ -1,26 +1,190 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root,
+html[data-theme="light"] {
+  --ink: #071714;
+  --moss: #0f766e;
+  --moss-deep: #0a4f49;
+  --foam: #e8f6f2;
+  --sand: #f4f1ea;
+  --paper: #fbfaf6;
+  --line: #d5e3df;
+  --muted: #5b6f6a;
+  --accent: #c9642a;
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --panel: rgba(255, 255, 255, 0.78);
+  --input-bg: #ffffff;
+  --grain-a: rgba(15, 118, 110, 0.18);
+  --grain-b: rgba(201, 100, 42, 0.12);
+  --grain-base: linear-gradient(180deg, #fbfaf6 0%, #f1f5f2 100%);
+  --switch-bg: rgba(255, 255, 255, 0.7);
+  --switch-active: #071714;
+  --switch-active-fg: #ffffff;
+}
+
+html[data-theme="dark"] {
+  --ink: #e8f3ef;
+  --moss: #2dd4bf;
+  --moss-deep: #99f6e4;
+  --foam: #163530;
+  --sand: #121c1a;
+  --paper: #0b1412;
+  --line: #2a3f3a;
+  --muted: #9bb0aa;
+  --accent: #f0a46a;
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --panel: rgba(18, 32, 29, 0.82);
+  --input-bg: #12201d;
+  --grain-a: rgba(45, 212, 191, 0.12);
+  --grain-b: rgba(240, 164, 106, 0.1);
+  --grain-base: linear-gradient(180deg, #0b1412 0%, #101c19 100%);
+  --switch-bg: rgba(18, 32, 29, 0.9);
+  --switch-active: #e8f3ef;
+  --switch-active-fg: #0b1412;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-moss: var(--moss);
+  --color-moss-deep: var(--moss-deep);
+  --color-foam: var(--foam);
+  --color-sand: var(--sand);
+  --color-paper: var(--paper);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-plex);
+  --font-display: var(--font-syne);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.display {
+  font-family: var(--font-syne), var(--font-plex), ui-sans-serif, system-ui,
+    sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.grain {
+  background-image:
+    radial-gradient(ellipse 80% 50% at 10% -10%, var(--grain-a), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 0%, var(--grain-b), transparent 50%),
+    var(--grain-base);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+html[data-theme="dark"] .btn-primary {
+  color: #0b1412;
+}
+
+.btn-primary:hover {
+  background: var(--moss-deep);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--input-bg);
+  color: var(--ink);
+  border-radius: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--moss);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+}
+
+.textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.header-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--switch-bg);
+}
+
+.header-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.header-switch button.is-active {
+  background: var(--switch-active);
+  color: var(--switch-active-fg);
+}
+
+.header-switch button:hover:not(.is-active) {
+  color: var(--ink);
 }
