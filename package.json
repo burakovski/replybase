@@ -6,7 +6,8 @@
     "dev": "next dev -p 3012",
     "build": "next build",
     "start": "next start -p 3012",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:smoke": "node scripts/qa-smoke.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
@@ -25,6 +26,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
+    "playwright": "^1.52.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

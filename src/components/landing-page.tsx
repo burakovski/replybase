@@ -53,17 +53,35 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                 {L.ragReady}
               </span>
             </div>
-            <div className="space-y-3 rounded-2xl bg-ink p-4 text-sm text-white">
-              <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-white/10 px-3 py-2">
+            <div
+              className="space-y-3 rounded-2xl p-4 text-sm"
+              style={{
+                background: "var(--chat-surface)",
+                color: "var(--chat-fg)",
+              }}
+            >
+              <div
+                className="max-w-[85%] rounded-2xl rounded-tl-sm px-3 py-2"
+                style={{ background: "var(--chat-user)" }}
+              >
                 {L.q1}
               </div>
-              <div className="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm bg-moss px-3 py-2">
+              <div
+                className="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm px-3 py-2"
+                style={{ background: "var(--chat-bot)" }}
+              >
                 {L.a1}
               </div>
-              <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-white/10 px-3 py-2">
+              <div
+                className="max-w-[80%] rounded-2xl rounded-tl-sm px-3 py-2"
+                style={{ background: "var(--chat-user)" }}
+              >
                 {L.q2}
               </div>
-              <div className="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm bg-moss px-3 py-2">
+              <div
+                className="ml-auto max-w-[90%] rounded-2xl rounded-tr-sm px-3 py-2"
+                style={{ background: "var(--chat-bot)" }}
+              >
                 {L.a2}
               </div>
             </div>
@@ -131,9 +149,17 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   key={plan.id}
                   className={`rounded-[1.75rem] border p-6 ${
                     plan.highlight
-                      ? "border-ink bg-ink text-white shadow-[0_24px_60px_rgba(7,23,20,0.25)]"
+                      ? "border-transparent shadow-[0_24px_60px_rgba(7,23,20,0.25)]"
                       : "panel"
                   }`}
+                  style={
+                    plan.highlight
+                      ? {
+                          background: "var(--chat-surface)",
+                          color: "var(--chat-fg)",
+                        }
+                      : undefined
+                  }
                 >
                   <p className="text-sm opacity-80">{copy.name}</p>
                   <p className="display mt-2 text-4xl font-extrabold">
@@ -144,7 +170,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                     </span>
                   </p>
                   <p
-                    className={`mt-3 text-sm ${plan.highlight ? "text-white/75" : "text-muted"}`}
+                    className={`mt-3 text-sm ${plan.highlight ? "opacity-75" : "text-muted"}`}
                   >
                     {copy.blurb}
                   </p>
@@ -156,10 +182,16 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   <Link
                     href="/signup"
                     className={`btn mt-8 w-full ${
-                      plan.highlight
-                        ? "bg-white text-ink hover:bg-foam"
-                        : "btn-primary"
+                      plan.highlight ? "" : "btn-primary"
                     }`}
+                    style={
+                      plan.highlight
+                        ? {
+                            background: "var(--chat-fg)",
+                            color: "var(--chat-surface)",
+                          }
+                        : undefined
+                    }
                   >
                     {L.choose} {copy.name}
                   </Link>

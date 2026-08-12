@@ -26,7 +26,17 @@ export default function AppHomePage() {
   }
 
   useEffect(() => {
-    load();
+    let cancelled = false;
+    void (async () => {
+      const res = await fetch("/api/bots");
+      const data = await res.json();
+      if (cancelled) return;
+      setBots(data.bots || []);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function createBot(e: FormEvent) {

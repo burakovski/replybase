@@ -18,6 +18,14 @@ cp .env.example .env.local
 npm run dev
 ```
 
+### Smoke (after build)
+
+```bash
+npm run build && npm run start
+# other terminal:
+npm run test:smoke
+```
+
 ### Required env
 
 | Variable | Where |

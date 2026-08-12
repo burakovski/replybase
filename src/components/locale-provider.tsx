@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import {
@@ -26,30 +27,63 @@ type LocaleContextValue = {
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
-export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
+let localeMemory: Locale = "en";
+const localeListeners = new Set<() => void>();
 
-  useEffect(() => {
-    const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (isLocale(stored)) {
-      setLocaleState(stored);
-      document.documentElement.lang = stored;
-    }
-  }, []);
+function applyLocaleDom(locale: Locale) {
+  document.documentElement.lang = locale;
+  document.documentElement.setAttribute("data-locale", locale);
+}
+
+function readStoredLocale(): Locale {
+  const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+  return isLocale(stored) ? stored : "en";
+}
+
+function subscribeLocale(onStoreChange: () => void) {
+  localeListeners.add(onStoreChange);
+  return () => {
+    localeListeners.delete(onStoreChange);
+  };
+}
+
+function getLocaleSnapshot(): Locale {
+  return localeMemory;
+}
+
+function getServerLocaleSnapshot(): Locale {
+  return "en";
+}
+
+function commitLocale(next: Locale) {
+  localeMemory = next;
+  window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
+  applyLocaleDom(next);
+  localeListeners.forEach((listener) => listener());
+}
+
+if (typeof window !== "undefined") {
+  localeMemory = readStoredLocale();
+  applyLocaleDom(localeMemory);
+}
+
+export function LocaleProvider({ children }: { children: ReactNode }) {
+  const locale = useSyncExternalStore(
+    subscribeLocale,
+    getLocaleSnapshot,
+    getServerLocaleSnapshot,
+  );
+  // Keep a React state mirror so consumers re-render after same-tab commits.
+  const [, bump] = useState(0);
+
+  useEffect(() => subscribeLocale(() => bump((n) => n + 1)), []);
 
   const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
-    window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
-    document.documentElement.lang = next;
+    commitLocale(next);
   }, []);
 
   const toggleLocale = useCallback(() => {
-    setLocaleState((prev) => {
-      const next: Locale = prev === "en" ? "ru" : "en";
-      window.localStorage.setItem(LOCALE_STORAGE_KEY, next);
-      document.documentElement.lang = next;
-      return next;
-    });
+    commitLocale(localeMemory === "en" ? "ru" : "en");
   }, []);
 
   const value = useMemo(

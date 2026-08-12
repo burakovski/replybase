@@ -75,8 +75,28 @@ export default function BotDetailPage() {
   }
 
   useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false;
+    void (async () => {
+      const res = await fetch(`/api/bots/${botId}`);
+      const data = await res.json();
+      if (cancelled) return;
+      if (!res.ok) {
+        setError(data.error || "Failed to load");
+        return;
+      }
+      setBot(data.bot);
+      setDocs(data.documents || []);
+      setEmbedAllowed(!!data.embedAllowed);
+      setMessages([
+        {
+          role: "assistant",
+          text: data.bot.welcomeMessage,
+        },
+      ]);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [botId]);
 
   async function uploadDoc(e: FormEvent) {
@@ -202,15 +222,22 @@ export default function BotDetailPage() {
 
         <section className="panel flex min-h-[520px] flex-col rounded-3xl p-5">
           <h2 className="display text-xl font-bold">In-app chat</h2>
-          <div className="mt-4 flex flex-1 flex-col gap-2 overflow-y-auto rounded-2xl bg-ink/95 p-4 text-sm text-white">
+          <div
+            className="mt-4 flex flex-1 flex-col gap-2 overflow-y-auto rounded-2xl p-4 text-sm"
+            style={{
+              background: "var(--chat-surface)",
+              color: "var(--chat-fg)",
+            }}
+          >
             {messages.map((m, i) => (
               <div
                 key={`${i}-${m.role}`}
-                className={`max-w-[90%] whitespace-pre-wrap rounded-2xl px-3 py-2 ${
-                  m.role === "user"
-                    ? "ml-auto bg-moss"
-                    : "bg-white/10"
-                }`}
+                className="max-w-[90%] whitespace-pre-wrap rounded-2xl px-3 py-2"
+                style={{
+                  background:
+                    m.role === "user" ? "var(--chat-bot)" : "var(--chat-user)",
+                  marginLeft: m.role === "user" ? "auto" : undefined,
+                }}
               >
                 {m.text}
               </div>
@@ -237,7 +264,13 @@ export default function BotDetailPage() {
             <p className="mt-2 text-sm text-muted">
               Paste this before <code>&lt;/body&gt;</code> on any site.
             </p>
-            <pre className="mt-4 overflow-x-auto rounded-2xl bg-ink p-4 text-xs text-foam">
+            <pre
+              className="mt-4 overflow-x-auto rounded-2xl p-4 text-xs"
+              style={{
+                background: "var(--chat-surface)",
+                color: "var(--chat-fg)",
+              }}
+            >
               {embedSnippet}
             </pre>
             <Link

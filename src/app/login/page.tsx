@@ -38,7 +38,7 @@ export default function LoginPage() {
   return (
     <div className="grain min-h-screen">
       <SiteHeader variant="auth" />
-      <div className="flex items-center justify-center px-5 py-8">
+      <main className="flex items-center justify-center px-5 py-8">
         <form
           onSubmit={onSubmit}
           className="panel w-full max-w-md rounded-[1.75rem] p-8"
@@ -71,7 +71,7 @@ export default function LoginPage() {
             </Link>
           </p>
         </form>
-      </div>
+      </main>
     </div>
   );
 }

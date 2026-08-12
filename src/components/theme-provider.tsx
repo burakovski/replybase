@@ -5,8 +5,9 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useEffectEvent,
+  useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -26,44 +27,64 @@ function systemTheme(): Theme {
     : "light";
 }
 
+function subscribeSystemTheme(onStoreChange: () => void) {
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+function getSystemThemeSnapshot(): Theme {
+  return systemTheme();
+}
+
+function getServerThemeSnapshot(): Theme {
+  return "light";
+}
+
 function applyTheme(theme: Theme) {
   document.documentElement.setAttribute("data-theme", theme);
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
-
-  const syncFromSystem = useEffectEvent(() => {
-    const next = systemTheme();
-    setThemeState(next);
-    applyTheme(next);
-  });
+  const system = useSyncExternalStore(
+    subscribeSystemTheme,
+    getSystemThemeSnapshot,
+    getServerThemeSnapshot,
+  );
+  const [override, setOverride] = useState<Theme | null>(null);
+  const theme = override ?? system;
 
   useEffect(() => {
-    syncFromSystem();
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => syncFromSystem();
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+    // OS scheme change re-syncs site theme (clears manual override).
+    const frame = requestAnimationFrame(() => setOverride(null));
+    return () => cancelAnimationFrame(frame);
+  }, [system]);
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
 
   const setTheme = useCallback((next: Theme) => {
-    setThemeState(next);
+    setOverride(next);
     applyTheme(next);
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setThemeState((prev) => {
-      const next: Theme = prev === "dark" ? "light" : "dark";
+    setOverride((prev) => {
+      const base = prev ?? systemTheme();
+      const next: Theme = base === "dark" ? "light" : "dark";
       applyTheme(next);
       return next;
     });
   }, []);
 
+  const value = useMemo(
+    () => ({ theme, toggleTheme, setTheme }),
+    [theme, toggleTheme, setTheme],
+  );
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }
 

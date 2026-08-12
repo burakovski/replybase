@@ -8,12 +8,12 @@ html[data-theme="light"] {
   --foam: #e8f6f2;
   --sand: #f4f1ea;
   --paper: #fbfaf6;
-  --line: #d5e3df;
+  --line: #6b857d;
   --muted: #5b6f6a;
-  --accent: #c9642a;
+  --accent: #a34d1f;
   --background: var(--paper);
   --foreground: var(--ink);
-  --panel: rgba(255, 255, 255, 0.78);
+  --panel: rgba(255, 255, 255, 0.86);
   --input-bg: #ffffff;
   --grain-a: rgba(15, 118, 110, 0.18);
   --grain-b: rgba(201, 100, 42, 0.12);
@@ -21,6 +21,13 @@ html[data-theme="light"] {
   --switch-bg: rgba(255, 255, 255, 0.7);
   --switch-active: #071714;
   --switch-active-fg: #ffffff;
+  --btn-primary-fg: #fbfaf6;
+  --focus-ring: rgba(15, 118, 110, 0.35);
+  /* Product mock stays dark in both themes for readable bubbles */
+  --chat-surface: #071714;
+  --chat-fg: #fbfaf6;
+  --chat-user: rgba(251, 250, 246, 0.12);
+  --chat-bot: #0f766e;
 }
 
 html[data-theme="dark"] {
@@ -30,12 +37,12 @@ html[data-theme="dark"] {
   --foam: #163530;
   --sand: #121c1a;
   --paper: #0b1412;
-  --line: #2a3f3a;
+  --line: #5a736c;
   --muted: #9bb0aa;
   --accent: #f0a46a;
   --background: var(--paper);
   --foreground: var(--ink);
-  --panel: rgba(18, 32, 29, 0.82);
+  --panel: rgba(18, 32, 29, 0.9);
   --input-bg: #12201d;
   --grain-a: rgba(45, 212, 191, 0.12);
   --grain-b: rgba(240, 164, 106, 0.1);
@@ -43,6 +50,12 @@ html[data-theme="dark"] {
   --switch-bg: rgba(18, 32, 29, 0.9);
   --switch-active: #e8f3ef;
   --switch-active-fg: #0b1412;
+  --btn-primary-fg: #0b1412;
+  --focus-ring: rgba(45, 212, 191, 0.4);
+  --chat-surface: #071714;
+  --chat-fg: #fbfaf6;
+  --chat-user: rgba(251, 250, 246, 0.12);
+  --chat-bot: #0f766e;
 }
 
 @theme inline {
@@ -92,6 +105,13 @@ a {
   letter-spacing: -0.03em;
 }
 
+/* Syne has no Cyrillic — use Exo 2 for RU display type */
+html[data-locale="ru"] .display {
+  font-family: var(--font-exo2), var(--font-plex), ui-sans-serif, system-ui,
+    sans-serif;
+  letter-spacing: -0.02em;
+}
+
 .grain {
   background-image:
     radial-gradient(ellipse 80% 50% at 10% -10%, var(--grain-a), transparent 55%),
@@ -120,22 +140,33 @@ a {
   transform: translateY(-1px);
 }
 
-.btn-primary {
-  background: var(--ink);
-  color: var(--paper);
+.btn:focus-visible,
+.header-switch button:focus-visible,
+.input:focus-visible,
+a.btn:focus-visible {
+  outline: 2px solid var(--moss);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--focus-ring);
 }
 
-html[data-theme="dark"] .btn-primary {
-  color: #0b1412;
+.btn-primary {
+  background: var(--ink);
+  color: var(--btn-primary-fg);
 }
 
 .btn-primary:hover {
   background: var(--moss-deep);
+  color: var(--btn-primary-fg);
+}
+
+html[data-theme="dark"] .btn-primary:hover {
+  color: #0b1412;
 }
 
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--line);
+  color: var(--ink);
 }
 
 .input {
@@ -148,9 +179,14 @@ html[data-theme="dark"] .btn-primary {
   outline: none;
 }
 
+.input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
 .input:focus {
   border-color: var(--moss);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .textarea {
