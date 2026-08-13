@@ -148,7 +148,7 @@
       const unanswered = !!data.unanswered;
       state.messages.push({
         role: "assistant",
-        text: unanswered ? L.noAnswer : data.answer,
+        text: data.answer,
         contactOperator: unanswered,
       });
     } catch (e) {

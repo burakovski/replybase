@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { corsOptions, withCors } from "@/lib/cors";
 import { getBotById, getProfileById } from "@/lib/db";
 import { canEmbed } from "@/lib/plans";
-import { resolveReplyLocale } from "@/lib/no-answer";
+import { resolveAnswerLocale } from "@/lib/no-answer";
 import { answerWithContext, retrieveChunksForBot } from "@/lib/rag";
 
 type Ctx = { params: Promise<{ botId: string }> };
@@ -60,16 +60,27 @@ export async function POST(req: Request, ctx: Ctx) {
       );
     }
 
-    const locale = resolveReplyLocale(
-      body.locale || req.headers.get("accept-language"),
-    );
+    // Language follows the message text; UI/Accept-Language only as fallback
+    const locale = resolveAnswerLocale({
+      message: body.message,
+      preferred: body.locale || req.headers.get("accept-language"),
+    });
     const retrieved = await retrieveChunksForBot(bot.id, body.message, 4);
+    // Custom no-answer is owner copy — only use it when it matches message language;
+    // otherwise fall back to the built-in string for that language.
+    const customNoAnswer = bot.noAnswerMessage?.trim() || "";
+    const customLocale = customNoAnswer
+      ? resolveAnswerLocale({ message: customNoAnswer })
+      : null;
+    const noAnswerMessage =
+      customNoAnswer && customLocale === locale ? customNoAnswer : undefined;
     const result = await answerWithContext({
       question: body.message,
       contextChunks: retrieved,
       systemPrompt: bot.systemPrompt,
       botName: bot.name,
       locale,
+      noAnswerMessage,
     });
 
     return withCors(

@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useLocale } from "@/components/locale-provider";
+import { LinkPendingSpinner } from "@/components/link-pending-spinner";
 
 type Bot = {
   id: string;
@@ -69,7 +71,7 @@ export default function AppHomePage() {
     const res = await fetch("/api/bots", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: trimmed }),
+      body: JSON.stringify({ name: trimmed, locale }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -119,10 +121,13 @@ export default function AppHomePage() {
           disabled={!!pendingName}
         />
         <button
-          className="btn btn-primary whitespace-nowrap"
+          className="btn btn-primary inline-flex items-center justify-center gap-2 whitespace-nowrap"
           type="submit"
           disabled={!!pendingName}
         >
+          {pendingName ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+          ) : null}
           {pendingName ? t.app.loading : t.app.createBot}
         </button>
       </form>
@@ -150,6 +155,7 @@ export default function AppHomePage() {
                   style={{ background: bot.primaryColor }}
                 />
                 <h2 className="display text-xl font-bold">{bot.name}</h2>
+                <LinkPendingSpinner className="ml-auto text-muted" />
               </div>
               <p className="mt-2 text-xs text-muted">
                 {t.app.created}{" "}

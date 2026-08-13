@@ -9,6 +9,7 @@ type BotRow = {
   public_key: string;
   system_prompt: string;
   welcome_message: string;
+  no_answer_message: string;
   primary_color: string;
   created_at: string;
 };
@@ -18,6 +19,7 @@ type DocRow = {
   bot_id: string;
   title: string;
   content: string;
+  file_ext?: string | null;
   created_at: string;
 };
 
@@ -45,6 +47,7 @@ function mapBot(row: BotRow): Bot {
     publicKey: row.public_key,
     systemPrompt: row.system_prompt,
     welcomeMessage: row.welcome_message,
+    noAnswerMessage: row.no_answer_message || "",
     primaryColor: row.primary_color,
     createdAt: row.created_at,
   };
@@ -56,6 +59,7 @@ function mapDoc(row: DocRow): Document {
     botId: row.bot_id,
     title: row.title,
     content: row.content,
+    fileExt: (row.file_ext || "").toLowerCase(),
     createdAt: row.created_at,
   };
 }
@@ -121,6 +125,7 @@ export async function createBot(input: {
   welcomeMessage: string;
   systemPrompt: string;
   primaryColor: string;
+  noAnswerMessage?: string;
 }): Promise<Bot> {
   const admin = createSupabaseAdmin();
   const row = {
@@ -130,6 +135,7 @@ export async function createBot(input: {
     public_key: nanoid(16),
     system_prompt: input.systemPrompt,
     welcome_message: input.welcomeMessage,
+    no_answer_message: input.noAnswerMessage || "",
     primary_color: input.primaryColor,
   };
   const { data, error } = await admin.from("bots").insert(row).select("*").single();
@@ -170,6 +176,7 @@ export async function updateBotForUser(
     name: string;
     welcomeMessage: string;
     systemPrompt: string;
+    noAnswerMessage: string;
     primaryColor: string;
   }>,
 ): Promise<Bot | null> {
@@ -180,6 +187,8 @@ export async function updateBotForUser(
     payload.welcome_message = patch.welcomeMessage;
   if (patch.systemPrompt !== undefined)
     payload.system_prompt = patch.systemPrompt;
+  if (patch.noAnswerMessage !== undefined)
+    payload.no_answer_message = patch.noAnswerMessage;
   if (patch.primaryColor !== undefined)
     payload.primary_color = patch.primaryColor;
 
@@ -229,6 +238,7 @@ export async function createDocumentWithChunks(input: {
   botId: string;
   title: string;
   content: string;
+  fileExt?: string;
   buildChunks: (documentId: string) => Promise<Chunk[]>;
 }): Promise<{ document: Document; chunkCount: number }> {
   const admin = createSupabaseAdmin();
@@ -238,13 +248,28 @@ export async function createDocumentWithChunks(input: {
     bot_id: input.botId,
     title: input.title,
     content: input.content,
+    file_ext: input.fileExt || "",
   };
 
-  const { data, error } = await admin
+  let { data, error } = await admin
     .from("documents")
     .insert(doc)
     .select("*")
     .single();
+  if (error?.message.includes("file_ext")) {
+    const retry = await admin
+      .from("documents")
+      .insert({
+        id: doc.id,
+        bot_id: doc.bot_id,
+        title: doc.title,
+        content: doc.content,
+      })
+      .select("*")
+      .single();
+    data = retry.data;
+    error = retry.error;
+  }
   if (error) throw new Error(error.message);
 
   const chunks = await input.buildChunks(documentId);
@@ -264,6 +289,24 @@ export async function createDocumentWithChunks(input: {
   }
 
   return { document: mapDoc(data as DocRow), chunkCount: chunks.length };
+}
+
+export async function getDocumentForUser(
+  botId: string,
+  docId: string,
+  userId: string,
+): Promise<Document | null> {
+  const bot = await getBotForUser(botId, userId);
+  if (!bot) return null;
+  const admin = createSupabaseAdmin();
+  const { data, error } = await admin
+    .from("documents")
+    .select("*")
+    .eq("id", docId)
+    .eq("bot_id", botId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data ? mapDoc(data as DocRow) : null;
 }
 
 export async function deleteDocumentForUser(
@@ -307,11 +350,12 @@ export async function matchChunksByEmbedding(input: {
     match_count: input.matchCount ?? 4,
   });
   if (error) throw new Error(error.message);
-  return ((data as ChunkRow[]) || []).map((row) => ({
+  return ((data as (ChunkRow & { similarity?: number })[]) || []).map((row) => ({
     id: row.id,
     botId: row.bot_id,
     documentId: row.document_id,
     text: row.content,
+    similarity: row.similarity,
   }));
 }
 

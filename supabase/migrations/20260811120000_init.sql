@@ -17,6 +17,7 @@ create table if not exists public.bots (
   public_key text not null unique,
   system_prompt text not null,
   welcome_message text not null,
+  no_answer_message text not null default '',
   primary_color text not null default '#0F766E',
   created_at timestamptz not null default now()
 );
@@ -26,6 +27,7 @@ create table if not exists public.documents (
   bot_id text not null references public.bots (id) on delete cascade,
   title text not null,
   content text not null,
+  file_ext text not null default '',
   created_at timestamptz not null default now()
 );
 

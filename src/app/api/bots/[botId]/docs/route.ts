@@ -8,6 +8,7 @@ import {
 } from "@/lib/db";
 import {
   extractDocumentText,
+  fileExtFromFilename,
   isSupportedDocFilename,
   titleFromFilename,
 } from "@/lib/extract-document";
@@ -26,6 +27,7 @@ const jsonSchema = z.object({
 async function parseUpload(req: Request): Promise<{
   title: string;
   content: string;
+  fileExt: string;
 }> {
   const contentType = req.headers.get("content-type") || "";
 
@@ -59,11 +61,15 @@ async function parseUpload(req: Request): Promise<{
 
     const titleField = String(form.get("title") || "").trim();
     const title = (titleField || titleFromFilename(file.name)).slice(0, 120);
-    return { title, content: extracted };
+    return {
+      title,
+      content: extracted,
+      fileExt: fileExtFromFilename(file.name),
+    };
   }
 
   const body = jsonSchema.parse(await req.json());
-  return body;
+  return { ...body, fileExt: "" };
 }
 
 export async function POST(req: Request, ctx: Ctx) {
@@ -72,7 +78,7 @@ export async function POST(req: Request, ctx: Ctx) {
   const { botId } = await ctx.params;
 
   try {
-    const { title, content } = await parseUpload(req);
+    const { title, content, fileExt } = await parseUpload(req);
     const bot = await getBotForUser(botId, user.id);
     if (!bot) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -91,10 +97,12 @@ export async function POST(req: Request, ctx: Ctx) {
       botId,
       title,
       content,
+      fileExt,
       buildChunks: (documentId) =>
         buildChunks({
           botId,
           documentId,
+          title,
           content,
         }),
     });
@@ -103,6 +111,7 @@ export async function POST(req: Request, ctx: Ctx) {
       document: {
         id: document.id,
         title: document.title,
+        fileExt: document.fileExt,
         createdAt: document.createdAt,
         chunks: chunkCount,
       },

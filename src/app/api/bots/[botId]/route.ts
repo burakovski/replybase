@@ -29,6 +29,7 @@ const patchSchema = z.object({
   name: z.string().min(2).max(80).optional(),
   welcomeMessage: z.string().max(280).optional(),
   systemPrompt: z.string().max(1000).optional(),
+  noAnswerMessage: z.string().max(280).optional(),
   primaryColor: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/)

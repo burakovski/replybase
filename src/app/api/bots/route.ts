@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth";
+import {
+  defaultNoAnswerMessage,
+  defaultSystemPrompt,
+  defaultWelcomeMessage,
+} from "@/lib/bot-defaults";
 import { countBotsForUser, createBot, listBotsForUser } from "@/lib/db";
+import { resolveReplyLocale } from "@/lib/no-answer";
 import { planLimits } from "@/lib/plans";
 
 const createSchema = z.object({
@@ -12,6 +18,8 @@ const createSchema = z.object({
     .max(80, "Bot name is too long"),
   welcomeMessage: z.string().max(280).optional(),
   systemPrompt: z.string().max(1000).optional(),
+  noAnswerMessage: z.string().max(280).optional(),
+  locale: z.enum(["en", "ru"]).optional(),
   primaryColor: z
     .string()
     .regex(/^#[0-9A-Fa-f]{6}$/)
@@ -42,15 +50,13 @@ export async function POST(req: Request) {
       );
     }
 
+    const locale = resolveReplyLocale(body.locale);
     const bot = await createBot({
       userId: user.id,
       name: body.name,
-      systemPrompt:
-        body.systemPrompt ||
-        "You help customers find answers from our product documentation.",
-      welcomeMessage:
-        body.welcomeMessage ||
-        "Hi! Ask me anything about the product — I’ll answer from our docs.",
+      systemPrompt: body.systemPrompt || defaultSystemPrompt(locale),
+      welcomeMessage: body.welcomeMessage || defaultWelcomeMessage(locale),
+      noAnswerMessage: body.noAnswerMessage || defaultNoAnswerMessage(locale),
       primaryColor: body.primaryColor || "#0F766E",
     });
 

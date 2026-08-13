@@ -14,6 +14,13 @@ export function titleFromFilename(filename: string) {
   );
 }
 
+export function fileExtFromFilename(filename: string) {
+  const match = filename.match(/\.([a-z0-9]+)$/i);
+  if (!match) return "";
+  const ext = match[1].toLowerCase();
+  return ext === "markdown" ? "md" : ext;
+}
+
 function looksLikePdf(buffer: Buffer, filename: string, mimeType?: string) {
   if (filename.toLowerCase().endsWith(".pdf")) return true;
   if (mimeType === "application/pdf") return true;

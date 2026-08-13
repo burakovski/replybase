@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Check, Info, Sparkles } from "lucide-react";
+import { Check, Info, Loader2, Sparkles } from "lucide-react";
 import { useLocale } from "@/components/locale-provider";
+import { LinkPendingSpinner } from "@/components/link-pending-spinner";
 import { PLANS } from "@/lib/plans";
 import type { PlanId } from "@/lib/types";
 
@@ -47,23 +49,50 @@ export default function BillingPage() {
       return;
     }
     setPlan(data.user.plan);
-    setMessage(
-      next === "free"
-        ? t.app.downgraded
-        : `${t.app.upgraded} (${data.receipt.id})`,
-    );
+    setMessage(next === "free" ? t.app.downgraded : t.app.upgraded);
   }
 
   const currentCopy = t.plans[plan];
   const currentMeta = PLANS.find((p) => p.id === plan)!;
   const highlightFeature = currentCopy.features[0];
 
+  if (!ready) {
+    return (
+      <div className="w-full pb-10" aria-busy="true">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 space-y-2">
+            <div className="h-10 w-64 max-w-full animate-pulse rounded-md bg-line/30" />
+            <div className="h-4 w-80 max-w-full animate-pulse rounded-md bg-line/25" />
+          </div>
+          <div className="h-11 w-28 shrink-0 animate-pulse rounded-full bg-line/30" />
+        </div>
+        <div className="panel mt-10 h-40 animate-pulse rounded-3xl bg-line/15" />
+        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+          <div className="panel h-72 animate-pulse rounded-3xl bg-line/15" />
+          <div className="panel h-72 animate-pulse rounded-3xl bg-line/15" />
+          <div className="panel h-72 animate-pulse rounded-3xl bg-line/15" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full pb-10">
-      <h1 className="display text-3xl font-bold tracking-tight sm:text-4xl">
-        {t.app.explorePlans}
-      </h1>
-      <p className="mt-2 text-sm text-muted">{t.app.comparePlans}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="display text-3xl font-bold tracking-tight sm:text-4xl">
+            {t.app.explorePlans}
+          </h1>
+          <p className="mt-2 text-sm text-muted">{t.app.comparePlans}</p>
+        </div>
+        <Link
+          href="/app"
+          className="btn btn-ghost inline-flex shrink-0 items-center gap-2 text-sm"
+        >
+          <LinkPendingSpinner />
+          {t.app.myBots}
+        </Link>
+      </div>
 
       <section className="mt-10">
         <div className="mb-3 flex items-center justify-between gap-3">
@@ -110,10 +139,13 @@ export default function BillingPage() {
                 </div>
                 <button
                   type="button"
-                  className="btn btn-primary shrink-0 px-3.5 py-2 text-sm"
+                  className="btn btn-primary inline-flex shrink-0 items-center gap-2 px-3.5 py-2 text-sm"
                   onClick={() => void choose("starter")}
                   disabled={loading === "starter"}
                 >
+                  {loading === "starter" ? (
+                    <Loader2 className="size-4 animate-spin" aria-hidden />
+                  ) : null}
                   {loading === "starter" ? t.app.processing : t.app.upgrade}
                 </button>
               </div>
@@ -196,19 +228,25 @@ export default function BillingPage() {
                   ) : isPopular ? (
                     <button
                       type="button"
-                      className="btn btn-primary w-full"
+                      className="btn btn-primary inline-flex w-full items-center justify-center gap-2"
                       disabled={loading === p.id}
                       onClick={() => void choose(p.id)}
                     >
+                      {loading === p.id ? (
+                        <Loader2 className="size-4 animate-spin" aria-hidden />
+                      ) : null}
                       {loading === p.id ? t.app.processing : t.app.upgrade}
                     </button>
                   ) : (
                     <button
                       type="button"
-                      className="btn btn-ghost w-full"
+                      className="btn btn-ghost inline-flex w-full items-center justify-center gap-2"
                       disabled={loading === p.id}
                       onClick={() => void choose(p.id)}
                     >
+                      {loading === p.id ? (
+                        <Loader2 className="size-4 animate-spin" aria-hidden />
+                      ) : null}
                       {loading === p.id
                         ? t.app.processing
                         : isDowngrade
@@ -239,16 +277,6 @@ export default function BillingPage() {
             );
           })}
         </div>
-      </section>
-
-      <section className="mt-12">
-        <h2 className="text-base font-bold text-ink">{t.app.billingFaqTitle}</h2>
-        <a
-          href="/#faq"
-          className="mt-2 inline-block text-sm font-medium text-moss-deep underline-offset-2 hover:underline"
-        >
-          {t.app.billingFaqLink}
-        </a>
       </section>
     </div>
   );

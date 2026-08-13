@@ -149,25 +149,46 @@ export type Dictionary = {
     perMonth: string;
     embedUpsellTitle: string;
     embedUpsellBody: string;
-    billingFaqTitle: string;
-    billingFaqLink: string;
     currentPlan: string;
     currentPlanLabel: string;
     billingMockNote: string;
     downgraded: string;
     upgraded: string;
     billingFailed: string;
+    charLimitHint: string;
     current: string;
     choosePlan: string;
     processing: string;
     created: string;
     backToBots: string;
+    myBots: string;
     managePlan: string;
     upgradeForEmbed: string;
+    editBot: string;
+    editBotTitle: string;
+    botNameLabel: string;
+    saveBotName: string;
+    savingBotName: string;
+    deleteBot: string;
+    deletingBot: string;
+    deleteBotConfirm: string;
+    renameFailed: string;
+    deleteFailed: string;
     documentsTitle: string;
     documentsHint: string;
     docTitlePlaceholder: string;
     docContentPlaceholder: string;
+    pasteOrDescribe: string;
+    instructionsTitle: string;
+    instructionsHint: string;
+    toneTitle: string;
+    instructionsPlaceholder: string;
+    fallbackTitle: string;
+    fallbackPlaceholder: string;
+    instructionsSave: string;
+    instructionsSaving: string;
+    instructionsSaved: string;
+    instructionsFailed: string;
     attachFile: string;
     attachHint: string;
     dropHint: string;
@@ -177,6 +198,8 @@ export type Dictionary = {
     fileTooLarge: string;
     uploadIndex: string;
     deleteDoc: string;
+    viewDoc: string;
+    closeDoc: string;
     noDocuments: string;
     chatTitle: string;
     chatPlaceholder: string;
@@ -460,27 +483,52 @@ const en: Dictionary = {
     embedUpsellTitle: "Embed widget",
     embedUpsellBody:
       "Upgrade to put your bot on any website with one script tag.",
-    billingFaqTitle: "FAQ",
-    billingFaqLink: "Plans, Billing & Payment",
     currentPlan: "Current plan",
     currentPlanLabel: "You’re on",
     billingMockNote: "Mock Stripe — no live charges",
-    downgraded: "Downgraded to Free.",
-    upgraded: "Mock Stripe charge succeeded. Embed unlocked.",
-    billingFailed: "Billing failed",
+    downgraded: "You’re back on the Free plan.",
+    upgraded: "Payment went through. The embed widget is unlocked.",
+    billingFailed: "Couldn’t change the plan. Try again.",
+    charLimitHint: "No more than {n} characters.",
     current: "Current plan",
     choosePlan: "Downgrade",
     processing: "Processing…",
     created: "Created",
     backToBots: "← All bots",
+    myBots: "My bots",
     managePlan: "Manage plan",
     upgradeForEmbed: "Upgrade for embed",
+    editBot: "Edit",
+    editBotTitle: "Edit bot",
+    botNameLabel: "Bot name",
+    saveBotName: "Save name",
+    savingBotName: "Saving…",
+    deleteBot: "Delete bot",
+    deletingBot: "Deleting…",
+    deleteBotConfirm:
+      "Delete this bot and all its documents? This can’t be undone.",
+    renameFailed: "Couldn’t rename the bot.",
+    deleteFailed: "Couldn’t delete the bot.",
     documentsTitle: "Documents",
     documentsHint:
-      "Paste help center content or attach .txt, .md, .pdf, or .docx.",
-    docTitlePlaceholder: "e.g. API keys & rotation",
+      "Knowledge only — articles the bot can quote. Tone and the “no match” reply are in Instructions above.",
+    docTitlePlaceholder: "Document title",
     docContentPlaceholder:
-      "Paste article text here…\n\nTip: include headings and steps so answers stay grounded.",
+      "Paste the article text.\n\nHeadings and numbered steps help the bot find the right passage.",
+    pasteOrDescribe: "or describe the document",
+    instructionsTitle: "Instructions",
+    instructionsHint:
+      "Tone is for answers from your docs. Fallback is what the bot says when nothing matches — the contact-operator button still appears.",
+    toneTitle: "Tone",
+    instructionsPlaceholder:
+      "Short, polite. Prices only from the docs.",
+    fallbackTitle: "If the answer isn’t in the docs",
+    fallbackPlaceholder:
+      "Not in the knowledge base. Rephrase or contact an operator.",
+    instructionsSave: "Save",
+    instructionsSaving: "Saving…",
+    instructionsSaved: "Saved",
+    instructionsFailed: "Could not save instructions",
     attachFile: "Attach file",
     attachHint: ".txt, .md, .csv, .json, .pdf, .docx",
     dropHint: "Drop file to attach",
@@ -489,8 +537,10 @@ const en: Dictionary = {
       "Could not read that file. Use txt, md, pdf, or docx.",
     fileTooShort: "File is too short (need at least 20 characters).",
     fileTooLarge: "File is too large (max 4 MB).",
-    uploadIndex: "Upload & index",
+    uploadIndex: "Add",
     deleteDoc: "Delete",
+    viewDoc: "Open document",
+    closeDoc: "Close",
     noDocuments: "No documents yet.",
     chatTitle: "In-app chat",
     chatPlaceholder: "Ask from your docs…",
@@ -777,27 +827,52 @@ const ru: Dictionary = {
     embedUpsellTitle: "Embed-виджет",
     embedUpsellBody:
       "Апгрейд — бот на любом сайте одним script-тегом.",
-    billingFaqTitle: "FAQ",
-    billingFaqLink: "Plans, Billing & Payment",
     currentPlan: "Текущий тариф",
     currentPlanLabel: "Сейчас у вас",
     billingMockNote: "Mock Stripe — без реальных списаний",
-    downgraded: "Понижено до Free.",
-    upgraded: "Mock-оплата Stripe прошла. Embed разблокирован.",
-    billingFailed: "Ошибка оплаты",
+    downgraded: "Вы снова на тарифе Free.",
+    upgraded: "Оплата прошла. Embed-виджет разблокирован.",
+    billingFailed: "Не удалось сменить тариф. Попробуйте ещё раз.",
+    charLimitHint: "Не более {n} символов.",
     current: "Current plan",
     choosePlan: "Downgrade",
     processing: "Processing…",
     created: "Создан",
     backToBots: "← Все боты",
+    myBots: "Мои боты",
     managePlan: "Управление тарифом",
     upgradeForEmbed: "Апгрейд для embed",
+    editBot: "Редактировать",
+    editBotTitle: "Редактировать бота",
+    botNameLabel: "Имя бота",
+    saveBotName: "Сохранить имя",
+    savingBotName: "Сохраняем…",
+    deleteBot: "Удалить бота",
+    deletingBot: "Удаляем…",
+    deleteBotConfirm:
+      "Удалить этого бота и все его документы? Это нельзя отменить.",
+    renameFailed: "Не удалось переименовать бота.",
+    deleteFailed: "Не удалось удалить бота.",
     documentsTitle: "Документы",
     documentsHint:
-      "Вставьте текст help center или прикрепите .txt, .md, .pdf или .docx.",
-    docTitlePlaceholder: "напр. API-ключи и ротация",
+      "Только база знаний — статьи, из которых бот цитирует. Тон и ответ «не найдено» — в блоке «Инструкции» выше.",
+    docTitlePlaceholder: "Название документа",
     docContentPlaceholder:
-      "Вставьте текст статьи сюда…\n\nСовет: оставляйте заголовки и шаги — ответы будут точнее.",
+      "Вставьте текст статьи.\n\nЗаголовки и нумерованные шаги помогают боту находить нужный фрагмент.",
+    pasteOrDescribe: "или опишите документ",
+    instructionsTitle: "Инструкции",
+    instructionsHint:
+      "Тон — как бот отвечает по документам. Fallback — что сказать, если в базе ничего нет. Кнопка «связаться с оператором» остаётся.",
+    toneTitle: "Тон",
+    instructionsPlaceholder:
+      "Коротко, на «вы». Цены только из документов.",
+    fallbackTitle: "Если ответа нет в документах",
+    fallbackPlaceholder:
+      "Этого нет в базе. Переформулируйте или свяжитесь с оператором.",
+    instructionsSave: "Сохранить",
+    instructionsSaving: "Сохраняем…",
+    instructionsSaved: "Сохранено",
+    instructionsFailed: "Не удалось сохранить инструкции",
     attachFile: "Прикрепить файл",
     attachHint: ".txt, .md, .csv, .json, .pdf, .docx",
     dropHint: "Отпустите файл, чтобы прикрепить",
@@ -806,8 +881,10 @@ const ru: Dictionary = {
       "Не удалось прочитать файл. Нужен txt, md, pdf или docx.",
     fileTooShort: "Файл слишком короткий (нужно минимум 20 символов).",
     fileTooLarge: "Файл слишком большой (макс. 4 МБ).",
-    uploadIndex: "Загрузить и проиндексировать",
+    uploadIndex: "Добавить",
     deleteDoc: "Удалить",
+    viewDoc: "Открыть документ",
+    closeDoc: "Закрыть",
     noDocuments: "Документов пока нет.",
     chatTitle: "Чат в приложении",
     chatPlaceholder: "Спросите по вашим документам…",

@@ -15,6 +15,7 @@ export type Bot = {
   publicKey: string;
   systemPrompt: string;
   welcomeMessage: string;
+  noAnswerMessage: string;
   primaryColor: string;
   createdAt: string;
 };
@@ -24,6 +25,7 @@ export type Document = {
   botId: string;
   title: string;
   content: string;
+  fileExt: string;
   createdAt: string;
 };
 
@@ -33,4 +35,6 @@ export type Chunk = {
   documentId: string;
   text: string;
   embedding?: number[];
+  similarity?: number;
+  documentTitle?: string;
 };
