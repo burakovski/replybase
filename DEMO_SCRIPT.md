@@ -1,113 +1,191 @@
-# Replybase — English demo script (human voice)
+# Replybase — текст демо (RU, прогон)
 
-Target length: **3–4 minutes**. Record screenshare + your voice (not AI TTS). Speak calmly, like a product walkthrough for a founder.
-
----
-
-## 0. Setup before recording (30 sec, off-camera)
-
-1. `npm run dev` → http://localhost:3012
-2. Hard refresh. Use a clean browser profile or Incognito.
-3. Optional: put `OPENAI_API_KEY` in `.env.local` for nicer answers.
-4. Close Slack/notifications.
+История: веб-студия **Eskviz** (`https://eskviz.com/`).  
+Локально: http://localhost:3012
 
 ---
 
-## 1. Opening (20–25 sec)
+## До старта (не в кадр)
 
-Show landing page. Zoom so the brand **Replybase** and headline are clear.
+1. Incognito. Язык UI: **RU**.
+2. `npm run dev` → http://localhost:3012
+3. В Finder: PDF и `docs/demo/FAQ-и-тарифы-Eskviz.md`
+4. Вкладка **https://eskviz.com/** — кусок текста, которого нет в файлах (контакты или SEO)
+5. Supabase: Auth + таблицы `profiles`, `bots`, `documents`, `chunks`
+6. OpenRouter → Activity
+7. По желанию: DevTools → Network → Fetch/XHR
 
-> “Hi, I’m Siarhei. This is Replybase — an embeddable chatbot builder.
-> I’ll show it the way my studio Eskviz would use it: upload the site FAQ, test in-app, then drop the widget on eskviz.com.”
-
----
-
-## 2. Landing + pricing (30–40 sec)
-
-Scroll Features → Pricing. Hover Starter.
-
-> “Landing explains the niche and core loop: docs, chat, embed.
-> Pricing is gated on purpose. Free is for testing in-app. Starter unlocks the embeddable widget.
-> Billing later is a Stripe test mock — no live charges, but the product decision is real.”
+Free = **3 документа**. PDF + MD + вставка — лимит. Четвёртый не грузи.
 
 ---
 
-## 3. Sign up + create bot (40 sec)
+## 1. Лендинг
 
-Sign up with a demo email → Create bot **Eskviz Help**.
+Открыть `/`. Дать прочитать заголовок.
 
-> “Customer story: my studio Eskviz wants a support bot on eskviz.com — visitors ask about price, timeline, BelGIE, without waiting for a human.
-> One bot, one knowledge base. Not a kitchen sink.”
+**Говоришь:**
+
+> Меня зовут Сергей.
+> Это Replybase — конструктор встраиваемого чат-бота.
+> Это не общий GPT, а ИИ, который работает с вашими документами: FAQ, инструкции, технические задания и другие.
+> На примере кейса веб-студии покажу, как это работает.
+
+Коротко показать Features / Pricing, без текста. Дальше — **Начать бесплатно**.
 
 ---
 
-## 4. Upload docs + in-app chat (60–75 sec)
+## 2. Регистрация
 
-Paste from `docs/demo/FAQ-и-тарифы-Eskviz.md` (source: https://eskviz.com/).
+`Начать бесплатно` → имя, новый email, пароль → зарегистрироваться.
 
-**Title field** (`placeholder: напр. API-ключи и ротация`):
+**Говоришь:**
+
+> Сначала обычная регистрация. Аккаунт создаётся в Supabase — это наша база и авторизация.
+> Сейчас покажу: новый пользователь появился в Auth, а в таблице профилей у него тариф Free.
+
+Показать: Authentication → Users, затем `profiles` → `plan = free`.
+
+Мы уже в приложении. Теперь кейс:
+
+> Студия Eskviz. Люди заходят на сайт и спрашивают одно и то же: сколько стоит лендинг, какие сроки, нужна ли регистрация в БелГИЭ.
+> Вместо того чтобы отвечать вручную, загружаем документы студии — и бот отвечает за нас.
+> Бесплатно можно собрать бота и проверить в приложении. Чтобы поставить его на сайт — нужен тариф Starter.
+
+---
+
+## 3. Создание бота
+
+Имя **Eskviz Help** → Создать бота.
+
+**Говоришь:**
+
+> Создаём бота для студии. Назовём его Eskviz Help — это имя увидит человек на сайте.
+> Один бот, одна база документов. Ничего лишнего.
+
+Показать таблицу `bots`: появилась строка.
+
+---
+
+## 4. Документы
+
+### PDF
+
+Прикрепить файл → PDF.
+
+**Говоришь:**
+
+> Сначала загружаю PDF. Бот не смотрит на файл как на картинку: мы достаём из него текст и кладём в базу.
+> В этот момент OpenRouter считает эмбеддинги — по сути, переводит текст в числа, чтобы потом искать по смыслу, а не по точному слову.
+> В Supabase это видно: документ и куски текста с векторами.
+
+Показать `documents` и `chunks` (embedding заполнен). OpenRouter Activity: `text-embedding-3-small`.
+
+### Markdown
+
+Прикрепить `.md`.
+
+**Говоришь:**
+
+> Теперь тот же текст, но в Markdown. Для бота формат не важен — хоть PDF, хоть md. Главное, что внутри.
+
+### Копипаст с сайта
+
+eskviz.com → скопировать абзац → название → вставить → Добавить.
+
+**Говоришь:**
+
+> И третий способ — вообще без файла. Открыл страницу студии, скопировал текст, вставил сюда.
+> Если на сайте обновили тарифы или контакты — можно так же быстро обновить базу бота.
+
+Показать в `documents` третью строку. В OpenRouter — ещё один запрос эмбеддингов.
+
+---
+
+## 5. Вопросы боту
+
+Правый чат. Ждать ответ, не перебивать.
+
+**1.** `Сколько стоит лендинг?`  
+Ждём: 890 BYN, пакет Старт.
+
+**Говоришь:**
+
+> Спрашиваю как клиент: «Сколько стоит лендинг?»
+> Что происходит: вопрос тоже уходит в OpenRouter — снова эмбеддинг. Supabase ищет ближайшие куски в документах. И уже по ним модель собирает ответ.
+> То есть отвечает не «из головы», а из того, что мы загрузили. Здесь это 890 рублей за Старт.
+
+Показать Network: `POST .../chat`, `"mode": "openai"`. OpenRouter: embedding + `gpt-4o-mini`.
+
+**2.** В чат: `Нужна ли регистрация в БелГИЭ?`  
+Ждём: да, для ИП и юрлиц, студия помогает.
+
+**Говоришь:**
+
+> Второй вопрос: «Нужна ли регистрация в БелГИЭ?» Это тоже есть в документах, поэтому бот отвечает по делу.
+
+**3.** В чат: `Какая гарантия возврата денег?`  
+Ждём: не знает / предложит оператора.
+
+**Говоришь:**
+
+> И третий: «Какая гарантия возврата денег?» Этого в документах нет. Бот не должен это выдумать — лучше сказать, что не знает, чем обещать лишнее.
+> Для поддержки это важнее, чем красивый ответ.
+
+Если грузил SEO: `Сколько стоит SEO?` — из SEO-дока, не 890 за сайт.
+
+---
+
+## 6. Тариф
+
+Оплата → Starter → Upgrade.
+
+**Говоришь:**
+
+> Бот внутри приложения уже работает. Чтобы поставить его на сайт, нужен Starter.
+> Оплата здесь учебная: Stripe mock, денег не списывает. Но сам тариф меняется — сейчас это видно в профиле.
+
+Показать `profiles.plan` = `starter`.
+
+---
+
+## 7. Виджет
+
+Назад к боту → показать script → **Открыть playground виджета**.  
+Спросить: `Сколько стоит лендинг?`
+
+**Говоришь:**
+
+> Вот готовый код: один script, его вставляют на сайт студии.
+> Playground — это как будто мы уже на чужом сайте. Тот же бот, те же документы, только виджет в углу.
+> Без Starter этот шаг был бы закрыт. Сейчас виджет открывается — спрашиваю то же: «Сколько стоит лендинг?»
+
+---
+
+## 8. Финал
+
+**Говоришь:**
+
+> Коротко: загрузили документы, бот отвечает по ним, а не фантазирует. Если не знает — так и говорит. Потом тариф, и тот же бот уже на сайте.
+> Под капотом — Next.js, Supabase и OpenRouter.
+> Спасибо, готов ответить на вопросы.
+
+---
+
+## Вопросы — копипаст
 
 ```
-FAQ и тарифы Eskviz
+Сколько стоит лендинг?
+Нужна ли регистрация в БелГИЭ?
+Какая гарантия возврата денег?
 ```
 
-**Textarea** — copy the file body (or drop the `.md`: title becomes `FAQ и тарифы Eskviz`).
-
-Click **Загрузить и проиндексировать** / **Upload & index**. Wait until the doc appears in the list.
-
-Ask:
-
-1. `Сколько стоит лендинг?`
-2. `Нужна ли регистрация в БелГИЭ?`
-3. `Какая гарантия возврата денег?` ← not in the corpus — must refuse
-
-> “I paste the Eskviz help article — real pricing, timeline, BelGIE.
-> Replybase chunks it for retrieval. Same questions a visitor would type on eskviz.com.
-> Refund policy isn’t in the docs, so it says it doesn’t know. Grounded answers beat hallucinations.”
-
-(If extractive mode without OpenAI:)
-
-> “This environment is running extractive mode — you still see grounded excerpts. With an API key, the same retrieval returns a short LLM answer.”
-
 ---
 
-## 5. Billing mock (30 sec)
+## Если ломается
 
-Open Billing → choose Starter → show success message.
-
-> “Embed is a paid feature. I upgrade with a mock Stripe checkout. Receipt is fake; the plan change is real in the app.”
-
----
-
-## 6. Embed widget (45–60 sec)
-
-Back to bot → show script tag → open playground → ask `Сколько стоит лендинг?` in the floating widget.
-
-> “Here’s the one-line embed. On eskviz.com this goes before the closing body tag.
-> Same bot, same FAQ. A visitor on the marketing site gets the 890 BYN answer — not a generic chatbot.”
-
----
-
-## 7. Close (15–20 sec)
-
-Return to landing or bot overview.
-
-> “That’s the MVP: focused scope, working docs-to-chat loop, gated embed, mock billing.
-> Thanks for watching — happy to iterate based on your feedback.”
-
----
-
-## Recording tips
-
-- 1080p, system audio off, your mic only
-- Cursor highlight / slow clicks
-- Don’t read the UI aloud word-for-word
-- If something fails, narrate the fix — product makers debug live
-
-## Where to send
-
-Upload unlisted YouTube / Loom / Google Drive and send:
-
-1. Link to the running app (or GitHub/GitLab + `npm run dev` instructions)
-2. Video demo URL
-3. Optional: 3–5 lines on niche choice and what you’d ship next
+- Email уже есть — другой.
+- Чат без нормального ответа — смотри OpenRouter Activity.
+- «allows 3 documents» — Free, лимит.
+- Виджет не открывается — тариф ещё Free.
+- Путает SEO и сайт — SEO должен быть отдельным документом.
+- Сломалось в кадре — скажи вслух и почини.

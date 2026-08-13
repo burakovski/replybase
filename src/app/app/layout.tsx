@@ -13,7 +13,7 @@ export default async function AppLayout({
   return (
     <div className="grain flex min-h-svh flex-col">
       <AppHeader email={user.email} planId={user.plan} />
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 py-8">
+      <div className="mx-auto flex w-full min-h-0 max-w-6xl flex-1 flex-col px-5 py-8">
         {children}
       </div>
     </div>

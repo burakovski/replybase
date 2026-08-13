@@ -102,7 +102,7 @@ function BotDetailSkeleton() {
         <Bone className="h-[2.875rem] w-40 shrink-0 rounded-full" />
       </div>
 
-      <div className="grid flex-1 gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
         <div className="flex flex-col gap-6">
           <section className="panel shrink-0 rounded-3xl p-5">
             <Bone className="h-7 w-40" />
@@ -126,8 +126,8 @@ function BotDetailSkeleton() {
             </div>
           </section>
         </div>
-        <div className="flex flex-col gap-6">
-          <section className="panel flex min-h-[520px] flex-1 flex-col rounded-3xl p-5">
+        <div className="flex flex-col">
+          <section className="panel flex h-[min(520px,calc(100svh-8rem))] flex-col rounded-3xl p-5 lg:h-[calc(100svh-8rem)]">
             <Bone className="h-7 w-40 shrink-0" />
             <div
               className="mt-4 flex min-h-0 flex-1 flex-col gap-3 rounded-2xl p-4"
@@ -318,8 +318,30 @@ export default function BotDetailPage() {
     };
   }, [botId, locale, t.app.loadFailed]);
 
+  function savedPrompt() {
+    if (!bot) return "";
+    return (bot.systemPrompt || "").trim() || defaultSystemPrompt(locale);
+  }
+
+  function savedFallback() {
+    if (!bot) return "";
+    return (
+      (bot.noAnswerMessage || "").trim() || defaultNoAnswerMessage(locale)
+    );
+  }
+
+  const instructionsDirty =
+    !!bot && (prompt !== savedPrompt() || fallback !== savedFallback());
+
+  function cancelPromptEdits() {
+    setPrompt(savedPrompt());
+    setFallback(savedFallback());
+    setPromptSaved(false);
+    setError("");
+  }
+
   async function savePrompt() {
-    if (promptBusy) return;
+    if (promptBusy || !instructionsDirty) return;
     if (prompt.length > 1000 || fallback.length > 280) return;
     setPromptBusy(true);
     setPromptSaved(false);
@@ -338,6 +360,11 @@ export default function BotDetailPage() {
         throw new Error(data.error || t.app.instructionsFailed);
       }
       setBot(data.bot);
+      setPrompt((data.bot.systemPrompt || "").trim() || defaultSystemPrompt(locale));
+      setFallback(
+        (data.bot.noAnswerMessage || "").trim() ||
+          defaultNoAnswerMessage(locale),
+      );
       setPromptSaved(true);
       window.setTimeout(() => setPromptSaved(false), 1600);
     } catch (err) {
@@ -569,8 +596,8 @@ export default function BotDetailPage() {
 
       {error ? <p className="shrink-0 text-sm text-accent">{error}</p> : null}
 
-      <div className="grid flex-1 gap-6 lg:grid-cols-2">
-        <div className="flex min-h-0 flex-col gap-6">
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+        <div className="flex flex-col gap-6">
           <section className="panel shrink-0 rounded-3xl p-5">
             <h2 className="display text-xl font-bold">
               {t.app.instructionsTitle}
@@ -585,17 +612,6 @@ export default function BotDetailPage() {
               onChange={(e) => {
                 setPrompt(e.target.value);
                 setPromptSaved(false);
-              }}
-              onBlur={() => {
-                if (
-                  bot &&
-                  prompt.length <= 1000 &&
-                  fallback.length <= 280 &&
-                  (prompt !== bot.systemPrompt ||
-                    fallback !== (bot.noAnswerMessage || ""))
-                ) {
-                  void savePrompt();
-                }
               }}
               placeholder={t.app.instructionsPlaceholder}
             />
@@ -614,17 +630,6 @@ export default function BotDetailPage() {
                 setFallback(e.target.value);
                 setPromptSaved(false);
               }}
-              onBlur={() => {
-                if (
-                  bot &&
-                  prompt.length <= 1000 &&
-                  fallback.length <= 280 &&
-                  (prompt !== bot.systemPrompt ||
-                    fallback !== (bot.noAnswerMessage || ""))
-                ) {
-                  void savePrompt();
-                }
-              }}
               placeholder={t.app.fallbackPlaceholder}
             />
             {fallback.length > 280 ? (
@@ -632,25 +637,40 @@ export default function BotDetailPage() {
                 {t.app.charLimitHint.replace("{n}", "280")}
               </p>
             ) : null}
-            <button
-              className="btn btn-ghost mt-4 inline-flex w-full items-center justify-center gap-2 text-sm"
-              type="button"
-              disabled={
-                promptBusy || prompt.length > 1000 || fallback.length > 280
-              }
-              onClick={() => void savePrompt()}
-            >
-              {promptBusy ? <InlineSpinner /> : null}
-              {promptBusy
-                ? t.app.instructionsSaving
-                : promptSaved
-                  ? t.app.instructionsSaved
-                  : t.app.instructionsSave}
-            </button>
+            {instructionsDirty || promptBusy || promptSaved ? (
+              <div className="mt-4 flex w-full flex-col gap-2 sm:flex-row">
+                <button
+                  className="btn btn-primary inline-flex w-full flex-1 items-center justify-center gap-2 text-sm"
+                  type="button"
+                  disabled={
+                    promptBusy ||
+                    !instructionsDirty ||
+                    prompt.length > 1000 ||
+                    fallback.length > 280
+                  }
+                  onClick={() => void savePrompt()}
+                >
+                  {promptBusy ? <InlineSpinner /> : null}
+                  {promptBusy
+                    ? t.app.instructionsSaving
+                    : promptSaved
+                      ? t.app.instructionsSaved
+                      : t.app.instructionsSave}
+                </button>
+                <button
+                  className="btn btn-ghost inline-flex w-full flex-1 items-center justify-center gap-2 text-sm"
+                  type="button"
+                  disabled={promptBusy}
+                  onClick={cancelPromptEdits}
+                >
+                  {t.app.instructionsCancel}
+                </button>
+              </div>
+            ) : null}
           </section>
 
           <section
-            className={`panel flex min-h-[520px] flex-1 flex-col rounded-3xl p-5 ${
+            className={`panel flex min-h-[520px] flex-col rounded-3xl p-5 ${
               dragging ? "ring-2 ring-moss" : ""
             }`}
             onDragOver={onDragOver}
@@ -767,8 +787,8 @@ export default function BotDetailPage() {
           </section>
         </div>
 
-        <div className="flex min-h-0 flex-col gap-6">
-          <section className="panel flex min-h-[520px] flex-1 flex-col rounded-3xl p-5">
+        <div className="flex flex-col lg:sticky lg:top-24 lg:self-start">
+          <section className="panel flex h-[min(520px,calc(100svh-8rem))] flex-col rounded-3xl p-5 lg:h-[calc(100svh-8rem)] lg:max-h-[calc(100svh-8rem)]">
             <h2 className="display shrink-0 text-xl font-bold">
               {t.app.chatTitle}
             </h2>

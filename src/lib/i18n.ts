@@ -188,6 +188,7 @@ export type Dictionary = {
     instructionsSave: string;
     instructionsSaving: string;
     instructionsSaved: string;
+    instructionsCancel: string;
     instructionsFailed: string;
     attachFile: string;
     attachHint: string;
@@ -528,6 +529,7 @@ const en: Dictionary = {
     instructionsSave: "Save",
     instructionsSaving: "Saving…",
     instructionsSaved: "Saved",
+    instructionsCancel: "Cancel",
     instructionsFailed: "Could not save instructions",
     attachFile: "Attach file",
     attachHint: ".txt, .md, .csv, .json, .pdf, .docx",
@@ -872,6 +874,7 @@ const ru: Dictionary = {
     instructionsSave: "Сохранить",
     instructionsSaving: "Сохраняем…",
     instructionsSaved: "Сохранено",
+    instructionsCancel: "Отменить",
     instructionsFailed: "Не удалось сохранить инструкции",
     attachFile: "Прикрепить файл",
     attachHint: ".txt, .md, .csv, .json, .pdf, .docx",
