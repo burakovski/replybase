@@ -125,6 +125,32 @@
       }
       list.appendChild(wrap);
     });
+    if (state.loading) {
+      const typing = el("div", {
+        style: {
+          alignSelf: "flex-start",
+          background: "#eef5f3",
+          color: "#163530",
+          borderRadius: "14px",
+          padding: "8px 12px",
+          minWidth: "2.75rem",
+          letterSpacing: "0.08em",
+          fontVariantNumeric: "tabular-nums",
+        },
+        text: ".",
+      });
+      list.appendChild(typing);
+      if (state._typingTimer) window.clearInterval(state._typingTimer);
+      const frames = [".", "..", "..."];
+      let i = 0;
+      state._typingTimer = window.setInterval(() => {
+        i = (i + 1) % frames.length;
+        typing.textContent = frames[i];
+      }, 400);
+    } else if (state._typingTimer) {
+      window.clearInterval(state._typingTimer);
+      state._typingTimer = null;
+    }
     list.scrollTop = list.scrollHeight;
   }
 
@@ -135,8 +161,8 @@
     const L = copy[locale];
     state.messages.push({ role: "user", text });
     input.value = "";
-    renderMessages(list);
     state.loading = true;
+    renderMessages(list);
     try {
       const res = await fetch(`${origin}/api/bots/${botId}/chat`, {
         method: "POST",

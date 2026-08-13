@@ -56,7 +56,7 @@
 > Второй вопрос: «Нужна ли регистрация в БелГИЭ?» Это тоже есть в документах, поэтому бот отвечает по делу.
 
 > И третий: «Какая гарантия возврата денег?» Этого в документах нет. Бот не должен это выдумать — лучше сказать, что не знает, чем обещать лишнее.
-> Для поддержки это важнее, чем красивый ответ.
+> Этот ответ можно поменять в поле «Если ответа нет в документах». Например: «Я не нашел информацию, с этим вопросом вам сейчас поможет наша поддержка».
 
 **Тариф**
 
@@ -129,7 +129,7 @@
 > Second question: “Do I need BelGIE registration?” That’s in the docs too, so the bot answers from there.
 
 > Third: “What’s the money-back guarantee?” That isn’t in the documents. The bot shouldn’t invent it — better to say it doesn’t know than to promise something extra.
-> For support, that matters more than a pretty answer.
+> You can change that reply in the “If the answer isn’t in the docs” field. For example: “I couldn’t find that. Our support team can help you with this question right now.”
 
 **Plan**
 

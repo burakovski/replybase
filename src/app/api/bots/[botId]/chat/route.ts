@@ -66,21 +66,14 @@ export async function POST(req: Request, ctx: Ctx) {
       preferred: body.locale || req.headers.get("accept-language"),
     });
     const retrieved = await retrieveChunksForBot(bot.id, body.message, 4);
-    // Custom no-answer is owner copy — only use it when it matches message language;
-    // otherwise fall back to the built-in string for that language.
-    const customNoAnswer = bot.noAnswerMessage?.trim() || "";
-    const customLocale = customNoAnswer
-      ? resolveAnswerLocale({ message: customNoAnswer })
-      : null;
-    const noAnswerMessage =
-      customNoAnswer && customLocale === locale ? customNoAnswer : undefined;
     const result = await answerWithContext({
       question: body.message,
       contextChunks: retrieved,
       systemPrompt: bot.systemPrompt,
       botName: bot.name,
       locale,
-      noAnswerMessage,
+      // Prefer owner-configured fallback when set
+      noAnswerMessage: bot.noAnswerMessage?.trim() || undefined,
     });
 
     return withCors(

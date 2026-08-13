@@ -9,10 +9,36 @@ type BotRow = {
   public_key: string;
   system_prompt: string;
   welcome_message: string;
-  no_answer_message: string;
+  no_answer_message?: string | null;
   primary_color: string;
   created_at: string;
 };
+
+/** Fallback storage until `bots.no_answer_message` exists in all envs. */
+const NO_ANSWER_MARKER = "[[RB_NO_ANSWER]]";
+
+export function unpackSystemPrompt(stored: string): {
+  systemPrompt: string;
+  noAnswerMessage: string;
+} {
+  const idx = stored.indexOf(NO_ANSWER_MARKER);
+  if (idx < 0) {
+    return { systemPrompt: stored, noAnswerMessage: "" };
+  }
+  return {
+    systemPrompt: stored.slice(0, idx).replace(/\n+$/, ""),
+    noAnswerMessage: stored.slice(idx + NO_ANSWER_MARKER.length).replace(/^\n+/, ""),
+  };
+}
+
+export function packSystemPrompt(
+  systemPrompt: string,
+  noAnswerMessage?: string | null,
+): string {
+  const base = unpackSystemPrompt(systemPrompt).systemPrompt.trimEnd();
+  const na = (noAnswerMessage ?? "").trim();
+  return na ? `${base}\n\n${NO_ANSWER_MARKER}\n${na}` : base;
+}
 
 type DocRow = {
   id: string;
@@ -40,14 +66,16 @@ type ProfileRow = {
 };
 
 function mapBot(row: BotRow): Bot {
+  const unpacked = unpackSystemPrompt(row.system_prompt || "");
+  const fromColumn = (row.no_answer_message || "").trim();
   return {
     id: row.id,
     userId: row.user_id,
     name: row.name,
     publicKey: row.public_key,
-    systemPrompt: row.system_prompt,
+    systemPrompt: unpacked.systemPrompt,
     welcomeMessage: row.welcome_message,
-    noAnswerMessage: row.no_answer_message || "",
+    noAnswerMessage: fromColumn || unpacked.noAnswerMessage,
     primaryColor: row.primary_color,
     createdAt: row.created_at,
   };
@@ -133,9 +161,11 @@ export async function createBot(input: {
     user_id: input.userId,
     name: input.name,
     public_key: nanoid(16),
-    system_prompt: input.systemPrompt,
+    system_prompt: packSystemPrompt(
+      input.systemPrompt,
+      input.noAnswerMessage || "",
+    ),
     welcome_message: input.welcomeMessage,
-    no_answer_message: input.noAnswerMessage || "",
     primary_color: input.primaryColor,
   };
   const { data, error } = await admin.from("bots").insert(row).select("*").single();
@@ -185,12 +215,21 @@ export async function updateBotForUser(
   if (patch.name !== undefined) payload.name = patch.name;
   if (patch.welcomeMessage !== undefined)
     payload.welcome_message = patch.welcomeMessage;
-  if (patch.systemPrompt !== undefined)
-    payload.system_prompt = patch.systemPrompt;
-  if (patch.noAnswerMessage !== undefined)
-    payload.no_answer_message = patch.noAnswerMessage;
   if (patch.primaryColor !== undefined)
     payload.primary_color = patch.primaryColor;
+
+  if (patch.systemPrompt !== undefined || patch.noAnswerMessage !== undefined) {
+    const current = await getBotForUser(botId, userId);
+    if (!current) return null;
+    payload.system_prompt = packSystemPrompt(
+      patch.systemPrompt !== undefined
+        ? patch.systemPrompt
+        : current.systemPrompt,
+      patch.noAnswerMessage !== undefined
+        ? patch.noAnswerMessage
+        : current.noAnswerMessage,
+    );
+  }
 
   const { data, error } = await admin
     .from("bots")

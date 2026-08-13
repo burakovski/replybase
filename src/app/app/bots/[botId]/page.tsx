@@ -87,6 +87,36 @@ function InlineSpinner({ className }: { className?: string }) {
   );
 }
 
+function TypingBubble() {
+  const [dots, setDots] = useState(".");
+
+  useEffect(() => {
+    const frames = [".", "..", "..."];
+    let i = 0;
+    const id = window.setInterval(() => {
+      i = (i + 1) % frames.length;
+      setDots(frames[i]);
+    }, 400);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return (
+    <div
+      className="flex max-w-[90%] flex-col gap-2"
+      style={{ alignItems: "flex-start" }}
+      aria-live="polite"
+      aria-label="…"
+    >
+      <div
+        className="min-w-[2.75rem] rounded-2xl px-3 py-2 tabular-nums tracking-wider"
+        style={{ background: "var(--chat-user)" }}
+      >
+        {dots}
+      </div>
+    </div>
+  );
+}
+
 function BotDetailSkeleton() {
   return (
     <div
@@ -185,6 +215,7 @@ export default function BotDetailPage() {
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
   const leftColRef = useRef<HTMLDivElement>(null);
   const chatShellRef = useRef<HTMLDivElement>(null);
+  const chatListRef = useRef<HTMLDivElement>(null);
   const [chatHeight, setChatHeight] = useState<number | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
@@ -460,6 +491,12 @@ export default function BotDetailPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [preview, editOpen, renameBusy, deleteBusy]);
+
+  useEffect(() => {
+    const el = chatListRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [messages, busy]);
 
   // Fit chat fully in viewport (incl. Send) and never taller than the left column
   useLayoutEffect(() => {
@@ -835,6 +872,7 @@ export default function BotDetailPage() {
               {t.app.chatTitle}
             </h2>
             <div
+              ref={chatListRef}
               className="mt-4 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-2xl p-4 text-sm"
               style={{
                 background: "var(--chat-surface)",
@@ -878,6 +916,7 @@ export default function BotDetailPage() {
                   ) : null}
                 </div>
               ))}
+              {busy ? <TypingBubble /> : null}
             </div>
             <form onSubmit={ask} className="mt-3 flex shrink-0 gap-2">
               <input
@@ -887,11 +926,7 @@ export default function BotDetailPage() {
                 placeholder={t.app.chatPlaceholder}
                 disabled={busy}
               />
-              <button
-                className="btn btn-primary inline-flex items-center gap-2"
-                disabled={busy}
-              >
-                {busy ? <InlineSpinner /> : null}
+              <button className="btn btn-primary" disabled={busy}>
                 {t.app.send}
               </button>
             </form>

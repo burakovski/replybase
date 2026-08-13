@@ -276,6 +276,18 @@ export async function retrieveChunksForBot(
   }));
 }
 
+function isNoAnswerModelOutput(raw: string): boolean {
+  const t = raw.trim();
+  if (!t || t === NO_ANSWER_SENTINEL || t.includes(NO_ANSWER_SENTINEL)) {
+    return true;
+  }
+  if (/^i (don't|do not) (have|know)/i.test(t)) return true;
+  // Model “answered” by describing absence in the docs — treat as no-answer
+  const absence =
+    /в документах нет|документах нет|в (ваших )?документах не|нет (в|такой) (информац|гарант|упоминан)|гарантии .{0,40} нет|не (указан|упомянут|содержит|нашёл|нашел)|не содержитс|документы не (содержат|упоминают)|there (is|are) no .{0,80}(in|from) (the )?(docs|documents|context)|not (mentioned|stated|found|included|covered).{0,40}(doc|context)|docs? (do not|don't|doesn’t).{0,40}(mention|include|say|cover)|no (refund|guarantee|warranty).{0,40}(doc|context|mentioned)/i;
+  return absence.test(t);
+}
+
 export async function answerWithContext(input: {
   question: string;
   contextChunks: Chunk[];
@@ -314,23 +326,24 @@ You are ${input.botName}, a product support assistant.
 Answer ONLY using the provided context.
 Each block is labeled with its source document. Do not mix facts across sources.
 Prices, plans, and tariffs apply only to the service or product that source explicitly names. A website or landing package that includes “basic SEO” is not an SEO tariff. If the question is about a named service, ignore prices for other services.
-If the context does not explicitly state the asked price or fact, reply with exactly ${NO_ANSWER_SENTINEL} and nothing else.
-Do not invent facts. Keep answers concise and practical.
+
+Critical no-answer rules:
+- If the context does not explicitly state the asked fact (price, guarantee, refund, feature, policy, etc.), reply with exactly ${NO_ANSWER_SENTINEL} and nothing else.
+- Never answer by saying the docs “don’t mention”, “don’t include”, “there is no … in the documents”, or similar. Absence of evidence is not an answer — use ${NO_ANSWER_SENTINEL}.
+- Do not invent facts, and do not infer negatives from missing text.
+
+Keep answers concise and practical when the context does support them.
 Always reply in the same language as the user's question (Russian → Russian, English → English). Do not switch languages.`,
           },
           {
             role: "user",
-            content: `Context:\n${context}\n\nQuestion: ${input.question}\n\nRespond in the same language as the question.`,
+            content: `Context:\n${context}\n\nQuestion: ${input.question}\n\nIf the answer is not explicitly in the context, reply with exactly ${NO_ANSWER_SENTINEL}. Otherwise answer in the same language as the question.`,
           },
         ],
       });
       const raw =
         completion.choices[0]?.message?.content?.trim() || NO_ANSWER_SENTINEL;
-      if (
-        raw === NO_ANSWER_SENTINEL ||
-        raw.includes(NO_ANSWER_SENTINEL) ||
-        /^i (don't|do not) (have|know)/i.test(raw)
-      ) {
+      if (isNoAnswerModelOutput(raw)) {
         return { answer: noAnswer, mode: "openai", unanswered: true };
       }
       return { answer: raw, mode: "openai", unanswered: false };
