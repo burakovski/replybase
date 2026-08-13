@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Exo_2, IBM_Plex_Sans, Syne } from "next/font/google";
+import { Geist, IBM_Plex_Sans } from "next/font/google";
 import Script from "next/script";
 import { Providers } from "@/components/providers";
 import "./globals.css";
@@ -10,14 +10,8 @@ const plex = IBM_Plex_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
-const syne = Syne({
-  variable: "--font-syne",
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-});
-
-const exo2 = Exo_2({
-  variable: "--font-exo2",
+const geist = Geist({
+  variable: "--font-geist",
   subsets: ["latin", "cyrillic"],
   weight: ["500", "600", "700", "800"],
 });
@@ -31,8 +25,11 @@ export const metadata: Metadata = {
   description:
     "Upload your product docs. Get an in-app assistant and an embeddable website widget that answers from your knowledge base.",
   icons: {
-    icon: [{ url: "/favicon.ico", sizes: "any" }],
-    apple: [{ url: "/apple-icon.png" }],
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo/fav-color-64.png", type: "image/png", sizes: "64x64" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png" }],
   },
   openGraph: {
     title: "Replybase — Embeddable chatbot from your docs",
@@ -62,7 +59,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-locale="en" suppressHydrationWarning>
       <body
-        className={`${plex.variable} ${syne.variable} ${exo2.variable} antialiased`}
+        className={`${plex.variable} ${geist.variable} antialiased`}
       >
         <Script id="theme-boot" strategy="beforeInteractive">
           {themeBoot}

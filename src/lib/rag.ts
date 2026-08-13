@@ -39,9 +39,40 @@ function keywordScore(query: string, text: string): number {
 }
 
 function getOpenAI() {
-  const key = process.env.OPENAI_API_KEY;
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+  const openAiKey = process.env.OPENAI_API_KEY;
+  const key = openRouterKey || openAiKey;
   if (!key) return null;
-  return new OpenAI({ apiKey: key });
+
+  if (openRouterKey) {
+    return new OpenAI({
+      apiKey: openRouterKey,
+      baseURL: "https://openrouter.ai/api/v1",
+      defaultHeaders: {
+        "HTTP-Referer":
+          process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3012",
+        "X-Title": "Replybase",
+      },
+    });
+  }
+
+  return new OpenAI({ apiKey: openAiKey });
+}
+
+function chatModel() {
+  return (
+    process.env.OPENAI_MODEL ||
+    (process.env.OPENROUTER_API_KEY ? "openai/gpt-4o-mini" : "gpt-4o-mini")
+  );
+}
+
+function embeddingModel() {
+  return (
+    process.env.OPENAI_EMBEDDING_MODEL ||
+    (process.env.OPENROUTER_API_KEY
+      ? "openai/text-embedding-3-small"
+      : "text-embedding-3-small")
+  );
 }
 
 export async function embedTexts(
@@ -51,7 +82,7 @@ export async function embedTexts(
   if (!client || texts.length === 0) return texts.map(() => undefined);
   try {
     const res = await client.embeddings.create({
-      model: "text-embedding-3-small",
+      model: embeddingModel(),
       input: texts,
     });
     return res.data
@@ -83,7 +114,7 @@ async function embedQuery(query: string): Promise<number[] | undefined> {
   if (!client) return undefined;
   try {
     const res = await client.embeddings.create({
-      model: "text-embedding-3-small",
+      model: embeddingModel(),
       input: query,
     });
     return res.data[0]?.embedding;
@@ -136,7 +167,7 @@ export async function answerWithContext(input: {
   if (client && context) {
     try {
       const completion = await client.chat.completions.create({
-        model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+        model: chatModel(),
         temperature: 0.2,
         messages: [
           {
@@ -175,7 +206,7 @@ Keep answers concise and practical.`,
     answer: `Based on your docs:\n\n${input.contextChunks
       .slice(0, 2)
       .map((c) => c.text)
-      .join("\n\n---\n\n")}\n\n(Demo mode: add OPENAI_API_KEY for full LLM answers.)`,
+      .join("\n\n---\n\n")}\n\n(Demo mode: add OPENROUTER_API_KEY or OPENAI_API_KEY for full LLM answers.)`,
     mode: "extractive",
   };
 }

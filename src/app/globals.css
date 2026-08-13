@@ -1,14 +1,18 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root,
 html[data-theme="light"] {
   --ink: #071714;
-  --moss: #0f766e;
-  --moss-deep: #0a4f49;
+  --moss: #1a6354;
+  --moss-deep: #0f4f43;
+  --primary: var(--moss);
+  --primary-fg: #fbfaf6;
   --foam: #e8f6f2;
   --sand: #f4f1ea;
   --paper: #fbfaf6;
-  --line: #6b857d;
+  --line: #d5e3df;
   --muted: #5b6f6a;
   --accent: #a34d1f;
   --background: var(--paper);
@@ -17,6 +21,8 @@ html[data-theme="light"] {
   --input-bg: #ffffff;
   --grain-a: rgba(15, 118, 110, 0.18);
   --grain-b: rgba(201, 100, 42, 0.12);
+  --grain-c: transparent;
+  --grain-d: transparent;
   --grain-base: linear-gradient(180deg, #fbfaf6 0%, #f1f5f2 100%);
   --switch-bg: rgba(255, 255, 255, 0.7);
   --switch-active: #071714;
@@ -27,26 +33,37 @@ html[data-theme="light"] {
   --chat-surface: #071714;
   --chat-fg: #fbfaf6;
   --chat-user: rgba(251, 250, 246, 0.12);
-  --chat-bot: #0f766e;
+  --chat-bot: #1a6354;
 }
 
 html[data-theme="dark"] {
   --ink: #e8f3ef;
   --moss: #2dd4bf;
   --moss-deep: #99f6e4;
+  --primary: var(--moss);
+  --primary-fg: #0b1412;
   --foam: #163530;
   --sand: #121c1a;
   --paper: #0b1412;
-  --line: #5a736c;
+  --line: #2a3f3a;
   --muted: #9bb0aa;
   --accent: #f0a46a;
   --background: var(--paper);
   --foreground: var(--ink);
   --panel: rgba(18, 32, 29, 0.9);
   --input-bg: #12201d;
-  --grain-a: rgba(45, 212, 191, 0.12);
-  --grain-b: rgba(240, 164, 106, 0.1);
-  --grain-base: linear-gradient(180deg, #0b1412 0%, #101c19 100%);
+  --grain-a: rgba(45, 212, 191, 0.22);
+  --grain-b: rgba(240, 164, 106, 0.18);
+  --grain-c: rgba(20, 184, 166, 0.14);
+  --grain-d: rgba(56, 189, 248, 0.08);
+  --grain-base: linear-gradient(
+    165deg,
+    #0b1412 0%,
+    #0f1f1c 28%,
+    #122820 52%,
+    #101c19 78%,
+    #0b1412 100%
+  );
   --switch-bg: rgba(18, 32, 29, 0.9);
   --switch-active: #e8f3ef;
   --switch-active-fg: #0b1412;
@@ -55,7 +72,7 @@ html[data-theme="dark"] {
   --chat-surface: #071714;
   --chat-fg: #fbfaf6;
   --chat-user: rgba(251, 250, 246, 0.12);
-  --chat-bot: #0f766e;
+  --chat-bot: #1a6354;
 }
 
 @theme inline {
@@ -70,8 +87,10 @@ html[data-theme="dark"] {
   --color-line: var(--line);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
   --font-sans: var(--font-plex);
-  --font-display: var(--font-syne);
+  --font-display: var(--font-geist);
 }
 
 * {
@@ -100,23 +119,19 @@ a {
 }
 
 .display {
-  font-family: var(--font-syne), var(--font-plex), ui-sans-serif, system-ui,
+  font-family: var(--font-geist), var(--font-plex), ui-sans-serif, system-ui,
     sans-serif;
   letter-spacing: -0.03em;
-}
-
-/* Syne has no Cyrillic — use Exo 2 for RU display type */
-html[data-locale="ru"] .display {
-  font-family: var(--font-exo2), var(--font-plex), ui-sans-serif, system-ui,
-    sans-serif;
-  letter-spacing: -0.02em;
 }
 
 .grain {
   background-image:
     radial-gradient(ellipse 80% 50% at 10% -10%, var(--grain-a), transparent 55%),
     radial-gradient(ellipse 60% 40% at 100% 0%, var(--grain-b), transparent 50%),
+    radial-gradient(ellipse 55% 45% at 85% 55%, var(--grain-c), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 5% 75%, var(--grain-d), transparent 55%),
     var(--grain-base);
+  background-attachment: fixed;
 }
 
 .panel {
@@ -132,8 +147,14 @@ html[data-locale="ru"] .display {
   gap: 0.5rem;
   border-radius: 999px;
   padding: 0.75rem 1.25rem;
+  min-height: 2.875rem;
   font-weight: 600;
-  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+  line-height: 1;
+  transition:
+    transform 0.2s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn:hover {
@@ -150,23 +171,63 @@ a.btn:focus-visible {
 }
 
 .btn-primary {
-  background: var(--ink);
-  color: var(--btn-primary-fg);
+  background: var(--primary);
+  color: var(--primary-fg);
 }
 
 .btn-primary:hover {
   background: var(--moss-deep);
-  color: var(--btn-primary-fg);
-}
-
-html[data-theme="dark"] .btn-primary:hover {
-  color: #0b1412;
+  color: var(--primary-fg);
 }
 
 .btn-ghost {
   background: transparent;
   border: 1px solid var(--line);
   color: var(--ink);
+}
+
+/* Explicit ink/paper — beats `a { color: inherit }` and theme utility quirks */
+a.btn-shiny,
+button.btn-shiny {
+  --shiny-bg: var(--ink);
+  --shiny-fg: var(--paper);
+  background-color: var(--shiny-bg);
+  color: var(--shiny-fg);
+}
+
+/* On dark surfaces (e.g. Starter card): light button + dark label/shine */
+a.btn-shiny.btn-shiny-inverse,
+button.btn-shiny.btn-shiny-inverse {
+  --shiny-bg: var(--chat-fg);
+  --shiny-fg: var(--chat-surface);
+}
+
+a.btn-shiny:hover,
+button.btn-shiny:hover {
+  background-color: var(--shiny-bg);
+  color: var(--shiny-fg);
+}
+
+a.btn-shiny > .btn-shiny-label,
+button.btn-shiny > .btn-shiny-label {
+  color: var(--shiny-fg);
+}
+
+.btn-hero {
+  min-height: 3.35rem;
+  padding: 1rem 1.7rem;
+  font-size: 1.05rem;
+  transform-style: preserve-3d;
+  perspective: 800px;
+}
+
+.btn-hero:hover {
+  transform: perspective(700px) rotateX(10deg) translateY(-3px);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--moss) 28%, transparent);
+}
+
+.btn-hero.btn-ghost:hover {
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--ink) 10%, transparent);
 }
 
 .input {
@@ -223,4 +284,32 @@ html[data-theme="dark"] .btn-primary:hover {
 
 .header-switch button:hover:not(.is-active) {
   color: var(--ink);
+}
+
+.nav-link {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 2px;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s ease;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
 }

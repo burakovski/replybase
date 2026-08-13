@@ -5,7 +5,11 @@ import { countBotsForUser, createBot, listBotsForUser } from "@/lib/db";
 import { planLimits } from "@/lib/plans";
 
 const createSchema = z.object({
-  name: z.string().min(2).max(80),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Bot name must be at least 2 characters")
+    .max(80, "Bot name is too long"),
   welcomeMessage: z.string().max(280).optional(),
   systemPrompt: z.string().max(1000).optional(),
   primaryColor: z
@@ -52,6 +56,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ bot });
   } catch (e) {
+    if (e instanceof z.ZodError) {
+      const first = e.issues[0];
+      return NextResponse.json(
+        { error: first?.message || "Invalid bot name" },
+        { status: 400 },
+      );
+    }
     const message = e instanceof Error ? e.message : "Could not create bot";
     return NextResponse.json({ error: message }, { status: 400 });
   }

@@ -5,55 +5,94 @@ export const LOCALE_STORAGE_KEY = "replybase-locale";
 
 export type Dictionary = {
   nav: {
-    features: string;
+    product: string;
     pricing: string;
+    faq: string;
     openApp: string;
     logIn: string;
     startFree: string;
     bots: string;
     billing: string;
     logOut: string;
+    myBots: string;
+    planBilling: string;
+    upgradePlan: string;
+    online: string;
+    logOutAccount: string;
   };
-  theme: { light: string; dark: string; toggle: string };
+  theme: { toggle: string };
   lang: { en: string; ru: string; toggle: string };
   landing: {
     eyebrow: string;
     title: string;
+    titleLead: string;
+    titleMark: string;
+    titleMid: string;
+    titleUnderlineA: string;
+    titleUnderlineB: string;
+    titleTail: string;
     subtitle: string;
     ctaPrimary: string;
     ctaSecondary: string;
-    livePreview: string;
-    previewBot: string;
-    ragReady: string;
-    q1: string;
-    a1: string;
-    q2: string;
-    a2: string;
-    pillDocs: string;
-    pillDocsSub: string;
-    pillChat: string;
-    pillChatSub: string;
-    pillWidget: string;
-    pillWidgetSub: string;
-    featuresTitle: string;
-    feature1Title: string;
-    feature1Body: string;
-    feature2Title: string;
-    feature2Body: string;
-    feature3Title: string;
-    feature3Body: string;
+    heroNote: string;
+    trustLine: string;
+    trust1: string;
+    trust2: string;
+    trust3: string;
+    problemTitle: string;
+    problemBody: string;
     howTitle: string;
-    stepLabel: string;
-    steps: [string, string, string, string];
+    steps: { title: string; body: string }[];
+    featuresTitle: string;
+    features: { title: string; body: string }[];
+    useCasesTitle: string;
+    useCases: { title: string; body: string }[];
+    demoTitle: string;
+    demoCaption: string;
+    demoPlaceholder: string;
     pricingTitle: string;
     pricingSubtitle: string;
-    choose: string;
-    footerLeft: string;
-    footerRight: string;
+    pricingNote: string;
+    contactUs: string;
+    faqTitle: string;
+    faqs: { q: string; a: string }[];
+    stillQuestions: string;
+    stillQuestionsHint: string;
+    emailPlaceholder: string;
+    contactSubject: string;
+    sendQuestion: string;
+    thanksContact: string;
+    finalTitle: string;
+    finalCta: string;
+    finalNote: string;
+    previewBot: string;
+    previewOnline: string;
+    previewSource: string;
+    previewAsk: string;
+    previewSend: string;
+    q1: string;
+    a1: string;
+    a1Source: string;
+    q2: string;
+    a2: string;
+    a2Source: string;
+    q3: string;
+    a3: string;
+    footerProduct: string;
+    footerPricing: string;
+    footerFaq: string;
+    footerContact: string;
+    footerPrint: string;
   };
   plans: Record<
     "free" | "starter" | "growth",
-    { name: string; period: string; blurb: string; features: string[] }
+    {
+      name: string;
+      period: string;
+      blurb: string;
+      features: string[];
+      cta: string;
+    }
   >;
   auth: {
     welcomeBack: string;
@@ -84,9 +123,26 @@ export type Dictionary = {
     noBots: string;
     open: string;
     createFailed: string;
+    botNameTooShort: string;
     billingTitle: string;
     billingSubtitle: string;
+    explorePlans: string;
+    comparePlans: string;
+    compareAllPlans: string;
+    yourCurrentPlan: string;
+    upgrade: string;
+    popular: string;
+    includes: string;
+    everythingIn: string;
+    billedMonthly: string;
+    perMonth: string;
+    embedUpsellTitle: string;
+    embedUpsellBody: string;
+    billingFaqTitle: string;
+    billingFaqLink: string;
     currentPlan: string;
+    currentPlanLabel: string;
+    billingMockNote: string;
     downgraded: string;
     upgraded: string;
     billingFailed: string;
@@ -94,83 +150,217 @@ export type Dictionary = {
     choosePlan: string;
     processing: string;
     created: string;
+    backToBots: string;
+    managePlan: string;
+    upgradeForEmbed: string;
+    documentsTitle: string;
+    documentsHint: string;
+    docTitlePlaceholder: string;
+    docContentPlaceholder: string;
+    attachFile: string;
+    attachHint: string;
+    dropHint: string;
+    uploading: string;
+    fileReadFailed: string;
+    fileTooShort: string;
+    uploadIndex: string;
+    deleteDoc: string;
+    noDocuments: string;
+    chatTitle: string;
+    chatPlaceholder: string;
+    send: string;
+    embedTitle: string;
+    embedHintLead: string;
+    embedHintTrail: string;
+    openPlayground: string;
+    copyCode: string;
+    copied: string;
+    embedGated: string;
+    upgradeMock: string;
+    unlockScript: string;
+    loadFailed: string;
+    uploadFailed: string;
+    chatFailed: string;
   };
 };
 
 const en: Dictionary = {
   nav: {
-    features: "Features",
+    product: "Product",
     pricing: "Pricing",
+    faq: "FAQ",
     openApp: "Open app",
     logIn: "Log in",
     startFree: "Start free",
     bots: "Bots",
     billing: "Billing",
     logOut: "Log out",
+    myBots: "My bots",
+    planBilling: "Plan & billing",
+    upgradePlan: "Upgrade plan",
+    online: "Online",
+    logOutAccount: "Log out",
   },
-  theme: { light: "Light", dark: "Dark", toggle: "Toggle theme" },
+  theme: { toggle: "Toggle theme" },
   lang: { en: "EN", ru: "RU", toggle: "Language" },
   landing: {
-    eyebrow: "For SaaS teams shipping support without a ticket queue",
-    title: "Turn your docs into an embeddable chatbot",
+    eyebrow:
+      "For SaaS teams tired of answering the same 20 questions in support",
+    title: "Turn your docs into a support agent that actually knows your product",
+    titleLead: "Turn ",
+    titleMark: "your docs",
+    titleMid: " into a ",
+    titleUnderlineA: "support",
+    titleUnderlineB: "agent",
+    titleTail: " that actually knows your product",
     subtitle:
-      "Upload help articles and product guides. Replybase answers inside your app — and as a widget on your website — using only your knowledge base.",
-    ctaPrimary: "Build your first bot",
-    ctaSecondary: "See how it works",
-    livePreview: "Live preview",
-    previewBot: "Acme Docs Bot",
-    ragReady: "RAG ready",
-    q1: "How do I rotate API keys?",
-    a1: "Open Settings → API Keys → Rotate. Old keys expire in 24 hours. Source: Security guide §4.",
-    q2: "Can I embed this on our marketing site?",
-    a2: "Yes — paste one script tag. Widget answers from the same docs.",
-    pillDocs: "Docs",
-    pillDocsSub: "upload",
-    pillChat: "Chat",
-    pillChatSub: "in-app",
-    pillWidget: "Widget",
-    pillWidgetSub: "embed",
-    featuresTitle: "Focused MVP. No feature bloat.",
-    feature1Title: "Docs → knowledge",
-    feature1Body:
-      "Paste help articles or policies. We chunk them for retrieval so answers stay grounded.",
-    feature2Title: "ChatGPT-like chat",
-    feature2Body:
-      "Test the assistant inside the app before you show it to customers.",
-    feature3Title: "One-line embed",
-    feature3Body:
-      "Drop a script on any site. Same bot, same knowledge, branded launcher.",
-    howTitle: "How teams use it",
-    stepLabel: "Step",
+      "Upload your help center, API docs, or product guides. Replybase answers questions inside your app and on your website — using only what you gave it, nothing invented.",
+    ctaPrimary: "Start free — no credit card",
+    ctaSecondary: "Watch 2-min demo",
+    heroNote: "Free plan includes 1 bot, 3 documents, 50 replies/month.",
+    trustLine:
+      "Answers are grounded in your documents. If it's not in your docs, Replybase says so instead of guessing.",
+    trust1: "Retrieval-based, not open-ended",
+    trust2: "Sources shown with every answer",
+    trust3: "No hallucinated pricing, policies, or steps",
+    problemTitle: "Support doesn't scale with headcount",
+    problemBody:
+      "Every new user asks the same questions your docs already answer. A generic AI chatbot either hallucinates answers or has no idea about your product. Replybase reads only what you upload — your help center, your policies, your product — and answers from that, in your app and on your site.",
+    howTitle: "From docs to deployed bot in under 10 minutes",
     steps: [
-      "Create a bot for one product area",
-      "Upload 3–10 core docs",
-      "Ask hard questions in-app",
-      "Embed on pricing / docs pages",
+      {
+        title: "Upload your docs",
+        body: "Paste help articles, policies, or product guides. Replybase chunks and indexes them for retrieval.",
+      },
+      {
+        title: "Test it like a user would",
+        body: "Ask hard questions in the built-in chat before anyone else sees it.",
+      },
+      {
+        title: "Embed it anywhere",
+        body: "One script tag. Same bot, same knowledge, your branding.",
+      },
+      {
+        title: "See what people actually ask",
+        body: "Every conversation is logged so you know what's missing from your docs.",
+      },
     ],
-    pricingTitle: "Pricing",
+    featuresTitle: "Built for teams who already have documentation",
+    features: [
+      {
+        title: "Grounded answers, not guesses",
+        body: "Replybase only answers from what you upload. When it doesn't know, it says so and can hand off to a human — instead of making something up.",
+      },
+      {
+        title: "Embed widget that matches your brand",
+        body: "One line of code adds a chat launcher to any page. Custom color, custom name, no visible “powered by” on paid plans.",
+      },
+      {
+        title: "Conversation history you can learn from",
+        body: "Every question is logged. Use it to find gaps in your docs before customers complain about them.",
+      },
+      {
+        title: "Multiple bots, one account",
+        body: "Run a separate bot per product, plan tier, or language without duplicating setup.",
+      },
+    ],
+    useCasesTitle: "Where teams put Replybase",
+    useCases: [
+      {
+        title: "Docs pages",
+        body: "Answer “how do I…” questions without a support ticket.",
+      },
+      {
+        title: "Pricing pages",
+        body: "Handle plan and feature questions before a sales call.",
+      },
+      {
+        title: "In-app help",
+        body: "Replace a stale FAQ modal with something that actually answers.",
+      },
+      {
+        title: "Onboarding",
+        body: "New users get unstuck without waiting on support hours.",
+      },
+    ],
+    demoTitle: "See it answer real questions",
+    demoCaption:
+      "2 minutes: upload docs → ask questions → embed on a live page.",
+    demoPlaceholder: "Video demo placeholder — screen recording with voiceover",
+    pricingTitle: "Simple pricing, upgrade when you need the widget",
     pricingSubtitle:
-      "Paid plans unlock the embeddable widget. Billing in the app is a Stripe test mock — no live charges.",
-    choose: "Choose",
-    footerLeft: "Replybase — Paralect Product Academy test MVP",
-    footerRight: "Niche: SaaS help docs → support chatbot",
+      "Billing runs on Stripe test mode for this demo — plans below reflect real pricing logic.",
+    pricingNote: "Need more documents or replies?",
+    contactUs: "Contact us",
+    faqTitle: "FAQ",
+    faqs: [
+      {
+        q: "Will it make things up?",
+        a: "No. Replybase only answers from documents you upload. If the answer isn't in your docs, it says so instead of guessing.",
+      },
+      {
+        q: "Do I need a developer to embed it?",
+        a: "No. One script tag on any page. Most teams add it themselves in a few minutes.",
+      },
+      {
+        q: "Can I see what people are asking?",
+        a: "Yes. Every conversation is logged in your dashboard so you can spot gaps in your documentation.",
+      },
+      {
+        q: "What happens if I go over my plan's limits?",
+        a: "You'll get a warning before hitting the cap, with an option to upgrade — the bot won't just stop answering mid-month.",
+      },
+      {
+        q: "Is my data used to train any models?",
+        a: "No. Your documents are only used to answer questions inside your account.",
+      },
+    ],
+    stillQuestions: "Still have questions?",
+    stillQuestionsHint: "Leave your email — we'll get back within one business day.",
+    emailPlaceholder: "you@company.com",
+    contactSubject: "Replybase question",
+    sendQuestion: "Send",
+    thanksContact: "Thanks — your mail client should open next.",
+    finalTitle: "Your docs already have the answers. Let them work.",
+    finalCta: "Start free — no credit card",
+    finalNote: "Free plan is enough to test on one help center today.",
+    previewBot: "Acme Docs Bot",
+    previewOnline: "Online",
+    previewSource: "Source:",
+    previewAsk: "Ask from your docs…",
+    previewSend: "Send",
+    q1: "How do I rotate API keys?",
+    a1: "Open Settings → API Keys → Rotate. Old keys expire after 24 hours.",
+    a1Source: "Security guide, §4 Key rotation",
+    q2: "Can I embed this on our marketing site?",
+    a2: "Yes — paste one script tag in your site's <head>. Same bot, same knowledge base, no separate setup.",
+    a2Source: "Getting started, §2 Embedding",
+    q3: "Do you support SSO login?",
+    a3: "Not in your docs yet. I can flag this for your team, or you can add it to the knowledge base.",
+    footerProduct: "Product",
+    footerPricing: "Pricing",
+    footerFaq: "FAQ",
+    footerContact: "Contact",
+    footerPrint:
+      "Built as a product MVP for Paralect Product Academy — billing runs on Stripe test mode, no live charges.",
   },
   plans: {
     free: {
       name: "Free",
-      period: "forever",
-      blurb: "Try Replybase on one help center.",
+      period: "",
+      blurb: "For trying Replybase on one help center.",
       features: [
         "1 chatbot",
         "Up to 3 documents",
-        "50 chat replies / month",
+        "50 replies / month",
         "In-app chat only",
       ],
+      cta: "Start free",
     },
     starter: {
       name: "Starter",
-      period: "/ month",
-      blurb: "Ship an embeddable widget on your marketing site.",
+      period: "/mo",
+      blurb: "For shipping your first embeddable widget.",
       features: [
         "3 chatbots",
         "30 documents",
@@ -178,18 +368,20 @@ const en: Dictionary = {
         "Embeddable website widget",
         "Custom brand color",
       ],
+      cta: "Choose Starter",
     },
     growth: {
       name: "Growth",
-      period: "/ month",
-      blurb: "For SaaS teams with multiple products or locales.",
+      period: "/mo",
+      blurb: "For teams with multiple products or languages.",
       features: [
         "10 chatbots",
         "200 documents",
         "15,000 replies / month",
-        "Embed widget + priority replies",
+        "Priority response speed",
         "Remove Replybase badge",
       ],
+      cta: "Choose Growth",
     },
   },
   auth: {
@@ -203,7 +395,7 @@ const en: Dictionary = {
     workEmail: "Work email",
     signingIn: "Signing in…",
     logIn: "Log in",
-    creating: "Creating…",
+    creating: "Creating account…",
     signUp: "Sign up",
     newHere: "New here?",
     createAccountLink: "Create account",
@@ -221,94 +413,249 @@ const en: Dictionary = {
     noBots: "No bots yet. Create one and upload a few docs.",
     open: "Open",
     createFailed: "Could not create bot",
-    billingTitle: "Billing",
+    botNameTooShort: "Bot name must be at least 2 characters.",
+    billingTitle: "Plan & billing",
     billingSubtitle:
-      "Stripe test mock — no live payments. Paid plans gate the embeddable widget.",
+      "Upgrade to unlock the embeddable widget. Billing runs in Stripe test mode — no live charges.",
+    explorePlans: "Explore plans",
+    comparePlans: "Compare all Replybase plans",
+    compareAllPlans: "Compare all plans",
+    yourCurrentPlan: "Your current plan",
+    upgrade: "Upgrade",
+    popular: "Popular",
+    includes: "Includes",
+    everythingIn: "Everything in",
+    billedMonthly: "billed monthly",
+    perMonth: "per workspace / month",
+    embedUpsellTitle: "Embed widget",
+    embedUpsellBody:
+      "Upgrade to put your bot on any website with one script tag.",
+    billingFaqTitle: "FAQ",
+    billingFaqLink: "Plans, Billing & Payment",
     currentPlan: "Current plan",
+    currentPlanLabel: "You’re on",
+    billingMockNote: "Mock Stripe — no live charges",
     downgraded: "Downgraded to Free.",
     upgraded: "Mock Stripe charge succeeded. Embed unlocked.",
     billingFailed: "Billing failed",
     current: "Current plan",
-    choosePlan: "Choose",
+    choosePlan: "Downgrade",
     processing: "Processing…",
     created: "Created",
+    backToBots: "← All bots",
+    managePlan: "Manage plan",
+    upgradeForEmbed: "Upgrade for embed",
+    documentsTitle: "Documents",
+    documentsHint:
+      "Paste help center content or attach a .txt / .md file.",
+    docTitlePlaceholder: "e.g. API keys & rotation",
+    docContentPlaceholder:
+      "Paste article text here…\n\nTip: include headings and steps so answers stay grounded.",
+    attachFile: "Attach file",
+    attachHint: ".txt, .md, .csv, .json",
+    dropHint: "Drop file to attach",
+    uploading: "Uploading…",
+    fileReadFailed: "Could not read that file. Use a text document.",
+    fileTooShort: "File is too short (need at least 20 characters).",
+    uploadIndex: "Upload & index",
+    deleteDoc: "Delete",
+    noDocuments: "No documents yet.",
+    chatTitle: "In-app chat",
+    chatPlaceholder: "Ask from your docs…",
+    send: "Send",
+    embedTitle: "Embeddable widget",
+    embedHintLead: "Paste this before",
+    embedHintTrail: "on any site.",
+    openPlayground: "Open widget playground",
+    copyCode: "Copy code",
+    copied: "Copied",
+    embedGated: "Embed is gated behind Starter/Growth.",
+    upgradeMock: "Upgrade with mock Stripe",
+    unlockScript: "to unlock the script tag.",
+    loadFailed: "Failed to load",
+    uploadFailed: "Upload failed",
+    chatFailed: "Chat failed",
   },
 };
 
 const ru: Dictionary = {
   nav: {
-    features: "Возможности",
+    product: "Продукт",
     pricing: "Цены",
+    faq: "FAQ",
     openApp: "Открыть приложение",
     logIn: "Войти",
     startFree: "Начать бесплатно",
     bots: "Боты",
     billing: "Оплата",
     logOut: "Выйти",
+    myBots: "Мои боты",
+    planBilling: "Тариф и оплата",
+    upgradePlan: "Upgrade plan",
+    online: "Online",
+    logOutAccount: "Выйти из аккаунта",
   },
-  theme: { light: "Светлая", dark: "Тёмная", toggle: "Сменить тему" },
+  theme: { toggle: "Сменить тему" },
   lang: { en: "EN", ru: "RU", toggle: "Язык" },
   landing: {
-    eyebrow: "Для SaaS-команд, которым нужна поддержка без очереди тикетов",
-    title: "Превратите документы в встраиваемого чат-бота",
+    eyebrow:
+      "Для SaaS-команд, которым надоело отвечать на одни и те же 20 вопросов в поддержке",
+    title:
+      "Превратите документы в агента поддержки, который реально знает ваш продукт",
+    titleLead: "Превратите ",
+    titleMark: "ваши документы",
+    titleMid: " в ",
+    titleUnderlineA: "агента",
+    titleUnderlineB: "поддержки",
+    titleTail: ", который реально знает ваш продукт",
     subtitle:
-      "Загрузите help-статьи и гайды. Replybase отвечает внутри приложения и виджетом на сайте — только по вашей базе знаний.",
-    ctaPrimary: "Создать первого бота",
-    ctaSecondary: "Как это работает",
-    livePreview: "Живой превью",
-    previewBot: "Acme Docs Bot",
-    ragReady: "RAG готов",
-    q1: "Как ротировать API-ключи?",
-    a1: "Откройте Settings → API Keys → Rotate. Старые ключи истекают через 24 часа. Источник: Security guide §4.",
-    q2: "Можно встроить на маркетинговый сайт?",
-    a2: "Да — один script-тег. Виджет отвечает по тем же документам.",
-    pillDocs: "Docs",
-    pillDocsSub: "загрузка",
-    pillChat: "Чат",
-    pillChatSub: "в приложении",
-    pillWidget: "Виджет",
-    pillWidgetSub: "embed",
-    featuresTitle: "Сфокусированный MVP. Без лишних фич.",
-    feature1Title: "Docs → знания",
-    feature1Body:
-      "Вставьте статьи или политики. Мы режем их на чанки для поиска — ответы остаются grounded.",
-    feature2Title: "Чат как в ChatGPT",
-    feature2Body:
-      "Проверьте ассистента внутри приложения, прежде чем показывать клиентам.",
-    feature3Title: "Embed в одну строку",
-    feature3Body:
-      "Вставьте скрипт на любой сайт. Тот же бот, те же знания, свой launcher.",
-    howTitle: "Как этим пользуются команды",
-    stepLabel: "Шаг",
+      "Загрузите help center, API-доки или продуктовые гайды. Replybase отвечает внутри приложения и на сайте — только по тому, что вы загрузили, без выдумок.",
+    ctaPrimary: "Начать бесплатно — без карты",
+    ctaSecondary: "Смотреть демо 2 мин",
+    heroNote: "Free: 1 бот, 3 документа, 50 ответов в месяц.",
+    trustLine:
+      "Ответы опираются на ваши документы. Если ответа нет в доках — Replybase так и скажет, а не будет угадывать.",
+    trust1: "Retrieval, не open-ended чат",
+    trust2: "Источники рядом с каждым ответом",
+    trust3: "Без выдуманных цен, политик и шагов",
+    problemTitle: "Поддержка не масштабируется наймом",
+    problemBody:
+      "Каждый новый пользователь задаёт те же вопросы, на которые уже отвечают ваши доки. Обычный AI-чатбот либо галлюцинирует, либо не знает продукт. Replybase читает только загруженное — help center, политики, продукт — и отвечает из этого в приложении и на сайте.",
+    howTitle: "От документов до бота на сайте меньше чем за 10 минут",
     steps: [
-      "Создайте бота под одну продуктовую область",
-      "Загрузите 3–10 ключевых документов",
-      "Задайте сложные вопросы в приложении",
-      "Встройте на pricing / docs страницы",
+      {
+        title: "Загрузите документы",
+        body: "Пастите статьи, политики или гайды. Replybase режет и индексирует их для поиска.",
+      },
+      {
+        title: "Проверьте как пользователь",
+        body: "Задайте сложные вопросы во встроенном чате, прежде чем кто-то ещё увидит бота.",
+      },
+      {
+        title: "Встройте куда угодно",
+        body: "Один script-тег. Тот же бот, те же знания, ваш бренд.",
+      },
+      {
+        title: "Смотрите, о чём реально спрашивают",
+        body: "Каждый диалог логируется — видно, чего не хватает в документации.",
+      },
     ],
-    pricingTitle: "Цены",
+    featuresTitle: "Для команд, у которых уже есть документация",
+    features: [
+      {
+        title: "Grounded-ответы, не догадки",
+        body: "Replybase отвечает только по загруженному. Если не знает — скажет и может передать человеку, а не выдумает.",
+      },
+      {
+        title: "Embed-виджет под ваш бренд",
+        body: "Одна строка кода добавляет launcher на любую страницу. Свой цвет, своё имя, без «powered by» на платных тарифах.",
+      },
+      {
+        title: "История диалогов, из которой учатся",
+        body: "Каждый вопрос логируется. Находите дыры в доках до жалоб клиентов.",
+      },
+      {
+        title: "Несколько ботов в одном аккаунте",
+        body: "Отдельный бот на продукт, тариф или язык — без дублирования настройки.",
+      },
+    ],
+    useCasesTitle: "Куда команды ставят Replybase",
+    useCases: [
+      {
+        title: "Docs-страницы",
+        body: "Ответы на «как сделать…» без тикета в поддержку.",
+      },
+      {
+        title: "Pricing",
+        body: "Вопросы по планам и фичам до звонка с sales.",
+      },
+      {
+        title: "Help внутри продукта",
+        body: "Вместо устаревшего FAQ-модала — ответы по делу.",
+      },
+      {
+        title: "Онбординг",
+        body: "Новые пользователи не ждут часов работы поддержки.",
+      },
+    ],
+    demoTitle: "Как он отвечает на реальные вопросы",
+    demoCaption:
+      "2 минуты: загрузить доки → задать вопросы → встроить на живую страницу.",
+    demoPlaceholder: "Плейсхолдер видео — скринкаст с голосом",
+    pricingTitle: "Простые тарифы — апгрейд, когда нужен виджет",
     pricingSubtitle:
-      "Платные тарифы открывают embed-виджет. Billing в приложении — mock Stripe, без реальных списаний.",
-    choose: "Выбрать",
-    footerLeft: "Replybase — тестовый MVP для Paralect Product Academy",
-    footerRight: "Ниша: SaaS help docs → support-чатбот",
+      "Биллинг в демо на Stripe test mode — тарифы ниже отражают реальную логику цен.",
+    pricingNote: "Нужно больше документов или ответов?",
+    contactUs: "Написать нам",
+    faqTitle: "FAQ",
+    faqs: [
+      {
+        q: "Он будет выдумывать?",
+        a: "Нет. Replybase отвечает только по загруженным документам. Если ответа нет — скажет об этом, а не угадает.",
+      },
+      {
+        q: "Нужен разработчик для embed?",
+        a: "Нет. Один script-тег на любой странице. Обычно команды вставляют сами за несколько минут.",
+      },
+      {
+        q: "Можно видеть, о чём спрашивают?",
+        a: "Да. Все диалоги в дашборде — видно пробелы в документации.",
+      },
+      {
+        q: "Что если превышу лимиты тарифа?",
+        a: "Предупредим до лимита и предложим апгрейд — бот не «умрёт» посреди месяца без предупреждения.",
+      },
+      {
+        q: "Мои данные идут в обучение моделей?",
+        a: "Нет. Документы используются только для ответов внутри вашего аккаунта.",
+      },
+    ],
+    stillQuestions: "Остались вопросы?",
+    stillQuestionsHint: "Оставьте email — ответим в течение рабочего дня.",
+    emailPlaceholder: "имя@компания.com",
+    contactSubject: "Вопрос по Replybase",
+    sendQuestion: "Отправить",
+    thanksContact: "Спасибо — сейчас откроется почтовый клиент.",
+    finalTitle: "В ваших документах уже есть ответы. Пусть они работают.",
+    finalCta: "Начать бесплатно — без карты",
+    finalNote: "Free-тарифа хватит, чтобы проверить на одном help center сегодня.",
+    previewBot: "Acme Docs Bot",
+    previewOnline: "Онлайн",
+    previewSource: "Источник:",
+    previewAsk: "Спросите по документам…",
+    previewSend: "Отправить",
+    q1: "Как ротировать API-ключи?",
+    a1: "Откройте Settings → API Keys → Rotate. Старые ключи истекают через 24 часа.",
+    a1Source: "Security guide, §4 Key rotation",
+    q2: "Можно встроить на маркетинговый сайт?",
+    a2: "Да — один script-тег в <head> сайта. Тот же бот, та же база знаний, без отдельной настройки.",
+    a2Source: "Getting started, §2 Embedding",
+    q3: "Поддерживаете ли вы SSO-логин?",
+    a3: "В ваших документах этого пока нет. Могу отметить вопрос для команды — или добавьте ответ в базу знаний.",
+    footerProduct: "Продукт",
+    footerPricing: "Цены",
+    footerFaq: "FAQ",
+    footerContact: "Контакт",
+    footerPrint:
+      "Продуктовый MVP для Paralect Product Academy — биллинг на Stripe test mode, без реальных списаний.",
   },
   plans: {
     free: {
       name: "Free",
-      period: "навсегда",
-      blurb: "Попробуйте Replybase на одном help center.",
+      period: "",
+      blurb: "Чтобы попробовать Replybase на одном help center.",
       features: [
         "1 чат-бот",
         "До 3 документов",
-        "50 ответов в чате / месяц",
+        "50 ответов / месяц",
         "Только чат в приложении",
       ],
+      cta: "Начать бесплатно",
     },
     starter: {
       name: "Starter",
-      period: "/ месяц",
-      blurb: "Встраиваемый виджет на маркетинговый сайт.",
+      period: "/мес",
+      blurb: "Чтобы запустить первый встраиваемый виджет.",
       features: [
         "3 чат-бота",
         "30 документов",
@@ -316,18 +663,20 @@ const ru: Dictionary = {
         "Встраиваемый виджет",
         "Свой цвет бренда",
       ],
+      cta: "Выбрать Starter",
     },
     growth: {
       name: "Growth",
-      period: "/ месяц",
-      blurb: "Для SaaS-команд с несколькими продуктами или локалями.",
+      period: "/мес",
+      blurb: "Для команд с несколькими продуктами или языками.",
       features: [
         "10 чат-ботов",
         "200 документов",
         "15 000 ответов / месяц",
-        "Embed + приоритетные ответы",
+        "Приоритетная скорость ответа",
         "Без бейджа Replybase",
       ],
+      cta: "Выбрать Growth",
     },
   },
   auth: {
@@ -335,14 +684,14 @@ const ru: Dictionary = {
     createAccount: "Создать аккаунт",
     signupHint:
       "Старт на Free. Позже можно апгрейднуть и открыть embed-виджет.",
-    email: "Email",
+    email: "Эл. почта",
     password: "Пароль",
     passwordMin: "Пароль (мин. 6)",
     name: "Имя",
-    workEmail: "Рабочий email",
+    workEmail: "Рабочая эл. почта",
     signingIn: "Входим…",
     logIn: "Войти",
-    creating: "Создаём…",
+    creating: "Создаём аккаунт…",
     signUp: "Зарегистрироваться",
     newHere: "Впервые здесь?",
     createAccountLink: "Создать аккаунт",
@@ -360,17 +709,68 @@ const ru: Dictionary = {
     noBots: "Ботов пока нет. Создайте одного и загрузите несколько документов.",
     open: "Открыть",
     createFailed: "Не удалось создать бота",
-    billingTitle: "Оплата",
+    botNameTooShort: "Имя бота — минимум 2 символа.",
+    billingTitle: "Тариф и оплата",
     billingSubtitle:
-      "Mock Stripe — без реальных платежей. Платные тарифы открывают embed-виджет.",
+      "Апгрейд открывает embed-виджет. Оплата в Stripe test mode — без реальных списаний.",
+    explorePlans: "Explore plans",
+    comparePlans: "Сравните все тарифы Replybase",
+    compareAllPlans: "Compare all plans",
+    yourCurrentPlan: "Your current plan",
+    upgrade: "Upgrade",
+    popular: "Popular",
+    includes: "Includes",
+    everythingIn: "Everything in",
+    billedMonthly: "ежемесячно",
+    perMonth: "за workspace / месяц",
+    embedUpsellTitle: "Embed-виджет",
+    embedUpsellBody:
+      "Апгрейд — бот на любом сайте одним script-тегом.",
+    billingFaqTitle: "FAQ",
+    billingFaqLink: "Plans, Billing & Payment",
     currentPlan: "Текущий тариф",
+    currentPlanLabel: "Сейчас у вас",
+    billingMockNote: "Mock Stripe — без реальных списаний",
     downgraded: "Понижено до Free.",
     upgraded: "Mock-оплата Stripe прошла. Embed разблокирован.",
     billingFailed: "Ошибка оплаты",
-    current: "Текущий тариф",
-    choosePlan: "Выбрать",
-    processing: "Обработка…",
+    current: "Current plan",
+    choosePlan: "Downgrade",
+    processing: "Processing…",
     created: "Создан",
+    backToBots: "← Все боты",
+    managePlan: "Управление тарифом",
+    upgradeForEmbed: "Апгрейд для embed",
+    documentsTitle: "Документы",
+    documentsHint:
+      "Вставьте текст help center или прикрепите .txt / .md файл.",
+    docTitlePlaceholder: "напр. API-ключи и ротация",
+    docContentPlaceholder:
+      "Вставьте текст статьи сюда…\n\nСовет: оставляйте заголовки и шаги — ответы будут точнее.",
+    attachFile: "Прикрепить файл",
+    attachHint: ".txt, .md, .csv, .json",
+    dropHint: "Отпустите файл, чтобы прикрепить",
+    uploading: "Загружаем…",
+    fileReadFailed: "Не удалось прочитать файл. Нужен текстовый документ.",
+    fileTooShort: "Файл слишком короткий (нужно минимум 20 символов).",
+    uploadIndex: "Загрузить и проиндексировать",
+    deleteDoc: "Удалить",
+    noDocuments: "Документов пока нет.",
+    chatTitle: "Чат в приложении",
+    chatPlaceholder: "Спросите по вашим документам…",
+    send: "Отправить",
+    embedTitle: "Встраиваемый виджет",
+    embedHintLead: "Вставьте это перед",
+    embedHintTrail: "на любом сайте.",
+    openPlayground: "Открыть playground виджета",
+    copyCode: "Копировать код",
+    copied: "Скопировано",
+    embedGated: "Embed доступен на тарифах Starter/Growth.",
+    upgradeMock: "Апгрейд через mock Stripe",
+    unlockScript: "чтобы открыть script-тег.",
+    loadFailed: "Не удалось загрузить",
+    uploadFailed: "Не удалось загрузить документ",
+    chatFailed: "Ошибка чата",
   },
 };
 

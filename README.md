@@ -33,8 +33,10 @@ npm run test:smoke
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | same |
 | `SUPABASE_SERVICE_ROLE_KEY` | same (server only) |
-| `OPENAI_API_KEY` | OpenAI dashboard |
-| `OPENAI_MODEL` | optional, default `gpt-4o-mini` |
+| `OPENROUTER_API_KEY` | [OpenRouter](https://openrouter.ai/) (preferred) |
+| `OPENAI_MODEL` | e.g. `openai/gpt-4o-mini` |
+| `OPENAI_EMBEDDING_MODEL` | e.g. `openai/text-embedding-3-small` |
+| `OPENAI_API_KEY` | optional fallback if OpenRouter unset |
 
 Apply schema once (SQL Editor or CLI):
 

@@ -17,9 +17,8 @@ Target length: **3–4 minutes**. Record screenshare + your voice (not AI TTS). 
 
 Show landing page. Zoom so the brand **Replybase** and headline are clear.
 
-> “Hi, I’m Siarhei. This is Replybase — an MVP of an embeddable chatbot builder.
-> The idea is simple: SaaS teams upload help docs, get an in-app assistant, and the same bot as a website widget.
-> I’ll walk through landing, the working product, billing, and the embed.”
+> “Hi, I’m Siarhei. This is Replybase — an embeddable chatbot builder.
+> I’ll show it the way my studio Eskviz would use it: upload the site FAQ, test in-app, then drop the widget on eskviz.com.”
 
 ---
 
@@ -35,26 +34,40 @@ Scroll Features → Pricing. Hover Starter.
 
 ## 3. Sign up + create bot (40 sec)
 
-Sign up with a demo email → Create bot “Acme Help”.
+Sign up with a demo email → Create bot **Eskviz Help**.
 
-> “I create an account and one bot for a single product area. Keeping scope focused — one knowledge base, not a kitchen sink.”
+> “Customer story: my studio Eskviz wants a support bot on eskviz.com — visitors ask about price, timeline, BelGIE, without waiting for a human.
+> One bot, one knowledge base. Not a kitchen sink.”
 
 ---
 
 ## 4. Upload docs + in-app chat (60–75 sec)
 
-Upload prefilled sample → ask:
+Paste from `docs/demo/FAQ-и-тарифы-Eskviz.md` (source: https://eskviz.com/).
 
-1. “How do I rotate API keys?”
-2. “What are the rate limits?”
+**Title field** (`placeholder: напр. API-ключи и ротация`):
 
-> “I paste a getting-started article. Replybase chunks it for retrieval.
-> Now the chat answers from those docs.
-> If the question isn’t covered, the assistant should say it doesn’t know — that’s better than hallucinating.”
+```
+FAQ и тарифы Eskviz
+```
+
+**Textarea** — copy the file body (or drop the `.md`: title becomes `FAQ и тарифы Eskviz`).
+
+Click **Загрузить и проиндексировать** / **Upload & index**. Wait until the doc appears in the list.
+
+Ask:
+
+1. `Сколько стоит лендинг?`
+2. `Нужна ли регистрация в БелГИЭ?`
+3. `Какая гарантия возврата денег?` ← not in the corpus — must refuse
+
+> “I paste the Eskviz help article — real pricing, timeline, BelGIE.
+> Replybase chunks it for retrieval. Same questions a visitor would type on eskviz.com.
+> Refund policy isn’t in the docs, so it says it doesn’t know. Grounded answers beat hallucinations.”
 
 (If extractive mode without OpenAI:)
 
-> “Right now this environment runs without a live LLM key, so you see grounded excerpts from the docs. With an OpenAI key, the same flow returns concise LLM answers over the retrieved chunks.”
+> “This environment is running extractive mode — you still see grounded excerpts. With an API key, the same retrieval returns a short LLM answer.”
 
 ---
 
@@ -68,10 +81,10 @@ Open Billing → choose Starter → show success message.
 
 ## 6. Embed widget (45–60 sec)
 
-Back to bot → show script tag → open playground → ask the same question via the floating widget.
+Back to bot → show script tag → open playground → ask `Сколько стоит лендинг?` in the floating widget.
 
-> “Here’s the one-line embed. On a real marketing site you’d paste this before the closing body tag.
-> Same bot, same knowledge. The widget is what customers see — so the product only ships when docs and chat already work.”
+> “Here’s the one-line embed. On eskviz.com this goes before the closing body tag.
+> Same bot, same FAQ. A visitor on the marketing site gets the 890 BYN answer — not a generic chatbot.”
 
 ---
 

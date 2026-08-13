@@ -50,17 +50,19 @@ async function testRoute(page, route, theme) {
       title: await page.title(),
       h1,
       headingOk: route.needsH1 ? h1 === 1 : h1 >= 0,
-      main: await page.locator("main").count(),
-      header: await page.locator("header").count(),
-      footer: await page.locator("footer").count(),
-      dataTheme: await page.locator("html").getAttribute("data-theme"),
-      errors: filterErrors(errors),
-    };
+    main: await page.locator("main").count(),
+    header: await page.locator("header").count(),
+    footer: await page.locator("footer").count(),
+    dataTheme: await page.locator("html").getAttribute("data-theme"),
+    errors: filterErrors(errors),
+  };
 
-    if (route.path === "/") {
-      await page.locator('a[href="#features"]').first().click({ timeout: 5000 });
+  if (route.path === "/") {
+      await page.locator('a[href="#product"]').first().click({ timeout: 5000 });
       await page.waitForTimeout(200);
-      status.featuresAnchor = await page.locator("#features").count();
+      status.productAnchor = await page.locator("#product").count();
+      status.faqAnchor = await page.locator("#faq").count();
+      // Landing keeps h1 in first-fold (outside <main>); still require exactly one.
     }
 
     if (route.needsFooter && status.footer < 1) {
