@@ -153,7 +153,7 @@ export function PlayfulHero() {
           <Link href="/signup" className="btn btn-primary btn-hero">
             {L.ctaPrimary}
           </Link>
-          <a href="#demo" className="btn btn-ghost btn-hero">
+          <a href="#pricing" className="btn btn-ghost btn-hero">
             {L.ctaSecondary}
           </a>
         </motion.div>

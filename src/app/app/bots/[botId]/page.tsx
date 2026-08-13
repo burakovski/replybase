@@ -13,7 +13,8 @@ import { useParams } from "next/navigation";
 import { Check, Copy, FileUp } from "lucide-react";
 import { useLocale } from "@/components/locale-provider";
 
-const TEXT_FILE_RE = /\.(txt|md|markdown|csv|json|log|tsv)$/i;
+const DOC_FILE_RE = /\.(txt|md|markdown|csv|json|log|tsv|pdf|docx)$/i;
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 type Doc = { id: string; title: string; createdAt: string };
 type Bot = {
@@ -25,7 +26,11 @@ type Bot = {
   primaryColor: string;
 };
 
-type Msg = { role: "user" | "assistant"; text: string };
+type Msg = {
+  role: "user" | "assistant";
+  text: string;
+  contactOperator?: boolean;
+};
 
 function Bone({ className }: { className?: string }) {
   return <div className={`animate-pulse rounded-md bg-line/30 ${className ?? ""}`} />;
@@ -88,7 +93,7 @@ function BotDetailSkeleton() {
 export default function BotDetailPage() {
   const params = useParams<{ botId: string }>();
   const botId = params.botId;
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [bot, setBot] = useState<Bot | null>(null);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [embedAllowed, setEmbedAllowed] = useState(false);
@@ -111,14 +116,6 @@ export default function BotDetailPage() {
     return filename.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim() || filename;
   }
 
-  async function readTextFile(file: File): Promise<string> {
-    const text = await file.text();
-    if (text.includes("\u0000")) {
-      throw new Error(t.app.fileReadFailed);
-    }
-    return text;
-  }
-
   async function postDocument(docTitle: string, docContent: string) {
     const res = await fetch(`/api/bots/${botId}/docs`, {
       method: "POST",
@@ -132,9 +129,32 @@ export default function BotDetailPage() {
     return data;
   }
 
+  async function postDocumentFile(file: File, docTitle: string) {
+    if (file.size > MAX_UPLOAD_BYTES) {
+      throw new Error(`${file.name}: ${t.app.fileTooLarge}`);
+    }
+    const form = new FormData();
+    form.append("file", file);
+    form.append("title", docTitle);
+    const res = await fetch(`/api/bots/${botId}/docs`, {
+      method: "POST",
+      body: form,
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || t.app.uploadFailed);
+    }
+    return data;
+  }
+
   async function ingestFiles(fileList: FileList | File[]) {
     const files = Array.from(fileList).filter(
-      (f) => TEXT_FILE_RE.test(f.name) || f.type.startsWith("text/"),
+      (f) =>
+        DOC_FILE_RE.test(f.name) ||
+        f.type.startsWith("text/") ||
+        f.type === "application/pdf" ||
+        f.type ===
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     );
     if (files.length === 0) {
       setError(t.app.fileReadFailed);
@@ -145,12 +165,8 @@ export default function BotDetailPage() {
     setUploading(true);
     try {
       for (const file of files) {
-        const text = (await readTextFile(file)).trim();
-        if (text.length < 20) {
-          throw new Error(`${file.name}: ${t.app.fileTooShort}`);
-        }
         const docTitle = titleFromFilename(file.name).slice(0, 120);
-        await postDocument(docTitle, text);
+        await postDocumentFile(file, docTitle);
       }
       setTitle("");
       setContent("");
@@ -266,16 +282,32 @@ export default function BotDetailPage() {
     const res = await fetch(`/api/bots/${botId}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: q }),
+      body: JSON.stringify({ message: q, locale }),
     });
     const data = await res.json();
     setBusy(false);
+    const unanswered = !!data.unanswered;
     setMessages((m) => [
       ...m,
       {
         role: "assistant",
-        text: res.ok ? data.answer : data.error || t.app.chatFailed,
+        text: res.ok
+          ? unanswered
+            ? t.app.noAnswer
+            : data.answer
+          : data.error || t.app.chatFailed,
+        contactOperator: res.ok && unanswered,
       },
+    ]);
+  }
+
+  function contactOperator(questionText: string) {
+    const subject = encodeURIComponent(t.app.contactOperatorSubject);
+    const body = encodeURIComponent(questionText);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    setMessages((m) => [
+      ...m,
+      { role: "assistant", text: t.app.contactOperatorSent },
     ]);
   }
 
@@ -327,7 +359,7 @@ export default function BotDetailPage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".txt,.md,.markdown,.csv,.json,.log,.tsv,text/plain,text/markdown,text/csv,application/json"
+              accept=".txt,.md,.markdown,.csv,.json,.log,.tsv,.pdf,.docx,text/plain,text/markdown,text/csv,application/json,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               multiple
               className="sr-only"
               onChange={(e) => {
@@ -409,14 +441,38 @@ export default function BotDetailPage() {
             {messages.map((m, i) => (
               <div
                 key={`${i}-${m.role}`}
-                className="max-w-[90%] whitespace-pre-wrap rounded-2xl px-3 py-2"
+                className="flex max-w-[90%] flex-col gap-2"
                 style={{
-                  background:
-                    m.role === "user" ? "var(--chat-bot)" : "var(--chat-user)",
                   marginLeft: m.role === "user" ? "auto" : undefined,
+                  alignItems: m.role === "user" ? "flex-end" : "flex-start",
                 }}
               >
-                {m.text}
+                <div
+                  className="whitespace-pre-wrap rounded-2xl px-3 py-2"
+                  style={{
+                    background:
+                      m.role === "user"
+                        ? "var(--chat-bot)"
+                        : "var(--chat-user)",
+                  }}
+                >
+                  {m.text}
+                </div>
+                {m.contactOperator ? (
+                  <button
+                    type="button"
+                    className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-[var(--chat-fg)] transition hover:bg-white/15"
+                    onClick={() => {
+                      const prev = messages
+                        .slice(0, i)
+                        .reverse()
+                        .find((x) => x.role === "user");
+                      contactOperator(prev?.text || m.text);
+                    }}
+                  >
+                    {t.app.contactOperator}
+                  </button>
+                ) : null}
               </div>
             ))}
           </div>

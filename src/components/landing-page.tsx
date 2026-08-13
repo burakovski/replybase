@@ -1,14 +1,24 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
-import { BookOpen, FileSearch, ShieldCheck } from "lucide-react";
+import {
+  BookOpen,
+  Check,
+  CircleHelp,
+  CreditCard,
+  FileSearch,
+  Rocket,
+  ShieldCheck,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 import {
   motion,
   useReducedMotion,
   useScroll,
   useSpring,
-  useTransform,
 } from "motion/react";
 import { PLANS } from "@/lib/plans";
 import { SiteHeader } from "@/components/site-header";
@@ -17,8 +27,23 @@ import { ScrollProgress } from "@/components/scroll-progress";
 import { FaqContactPopover } from "@/components/faq-contact-popover";
 import { useLocale } from "@/components/locale-provider";
 import { PlayfulHero } from "@/components/playful-hero";
+import { HoverEffect } from "@/components/ui/card-hover-effect";
 import { ShinyButton } from "@/components/ui/shiny-button";
-import { GlowCard } from "@/components/ui/glow-card";
+import { SupportedModels } from "@/components/supported-models";
+import { OldWaySection } from "@/components/old-way-section";
+
+const PLAN_ICONS = {
+  free: Zap,
+  starter: Sparkles,
+  growth: Rocket,
+} as const;
+
+const FEATURE_VISUALS = [
+  "/images/feature-grounded.webp",
+  "/images/feature-embed.webp",
+  "/images/feature-history.webp",
+  "/images/feature-bots.webp",
+] as const;
 
 export function LandingPage({ signedIn }: { signedIn: boolean }) {
   const { t } = useLocale();
@@ -31,31 +56,13 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
     { icon: ShieldCheck, label: L.trust3 },
   ];
 
-  const problemRef = useRef<HTMLElement>(null);
   const howRef = useRef<HTMLElement>(null);
-  const demoRef = useRef<HTMLElement>(null);
-
-  const { scrollYProgress: problemProgress } = useScroll({
-    target: problemRef,
-    offset: ["start end", "end start"],
-  });
-  const problemY = useTransform(
-    problemProgress,
-    [0, 1],
-    reduce ? [0, 0] : [6, -6],
-  );
 
   const { scrollYProgress: howProgress } = useScroll({
     target: howRef,
     offset: ["start 0.75", "end 0.45"],
   });
   const howLine = useSpring(howProgress, { stiffness: 90, damping: 24 });
-
-  const { scrollYProgress: demoProgress } = useScroll({
-    target: demoRef,
-    offset: ["start 0.85", "end 0.35"],
-  });
-  const demoBar = useSpring(demoProgress, { stiffness: 100, damping: 26 });
 
   return (
     <div className="grain">
@@ -95,20 +102,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
           </motion.section>
         </div>
 
-        <section
-          id="product"
-          ref={problemRef}
-          className="mx-auto max-w-6xl px-5 py-24 sm:py-28"
-        >
-          <motion.div style={{ y: problemY }}>
-            <h2 className="display max-w-2xl text-3xl font-bold sm:text-4xl">
-              {L.problemTitle}
-            </h2>
-            <p className="mt-5 max-w-3xl text-base leading-relaxed text-muted">
-              {L.problemBody}
-            </p>
-          </motion.div>
-        </section>
+        <OldWaySection />
 
         <section
           ref={howRef}
@@ -145,7 +139,9 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
                   <p className="text-xs font-semibold uppercase tracking-wider text-moss-deep">
                     {String(i + 1).padStart(2, "0")}
                   </p>
-                  <h3 className="display mt-3 text-lg font-bold">{step.title}</h3>
+                  <h3 className="display mt-3 text-lg font-bold">
+                    {step.title}
+                  </h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted">
                     {step.body}
                   </p>
@@ -156,119 +152,141 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
         </section>
 
         <section id="features" className="mx-auto max-w-6xl px-5 py-24 sm:py-28">
-          <h2 className="display max-w-3xl text-3xl font-bold sm:text-4xl">
-            {L.featuresTitle}
-          </h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
-            {L.features.map((f) => (
-              <GlowCard key={f.title}>
-                <h3 className="display text-xl font-bold">{f.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted">{f.body}</p>
-              </GlowCard>
-            ))}
+          <div className="max-w-3xl">
+            <h2 className="display text-3xl font-bold sm:text-4xl">
+              {L.featuresTitle}
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">
+              {L.featuresSubtitle}
+            </p>
+          </div>
+
+          <div className="mt-12 flex flex-col gap-5 md:gap-6">
+            {L.features.map((f, i) => {
+              const visual = FEATURE_VISUALS[i] ?? FEATURE_VISUALS[0];
+              const imageLeft = i % 2 === 0;
+
+              return (
+                <article
+                  key={f.title}
+                  className="grid overflow-hidden rounded-[1.75rem] border border-line md:grid-cols-2"
+                >
+                  <div
+                    className={`relative min-h-[240px] bg-foam sm:min-h-[280px] lg:min-h-[340px] ${
+                      imageLeft ? "md:order-1" : "md:order-2"
+                    }`}
+                  >
+                    <Image
+                      src={visual}
+                      alt={f.title}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                    />
+                  </div>
+
+                  <div
+                    className={`flex min-h-[240px] flex-col justify-center bg-[var(--panel)] p-7 sm:min-h-[280px] sm:p-9 lg:min-h-[340px] lg:p-10 ${
+                      imageLeft
+                        ? "md:order-2 md:border-l md:border-line"
+                        : "md:order-1 md:border-r md:border-line"
+                    }`}
+                  >
+                    <h3 className="display text-2xl font-bold tracking-tight sm:text-[1.75rem]">
+                      {f.title}
+                    </h3>
+                    <p className="mt-4 max-w-md text-sm leading-relaxed text-muted sm:text-base">
+                      {f.body}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
+
+        <SupportedModels />
 
         <section className="mx-auto max-w-6xl px-5 py-24 sm:py-28">
           <h2 className="display text-3xl font-bold sm:text-4xl">
             {L.useCasesTitle}
           </h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {L.useCases.map((u) => (
-              <article
-                key={u.title}
-                className="rounded-3xl border border-line bg-foam/50 p-5"
-              >
-                <h3 className="display text-lg font-bold">{u.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{u.body}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section
-          id="demo"
-          ref={demoRef}
-          className="mx-auto max-w-6xl px-5 py-24 sm:py-28"
-        >
-          <h2 className="display text-3xl font-bold sm:text-4xl">
-            {L.demoTitle}
-          </h2>
-          <div className="panel relative mt-10 overflow-hidden rounded-[2rem]">
-            <motion.div
-              aria-hidden
-              className="absolute inset-x-0 top-0 z-10 h-[2px] origin-left bg-moss"
-              style={{ scaleX: demoBar }}
-            />
-            <div className="flex min-h-[240px] items-center justify-center p-8 md:min-h-[320px]">
-              <p className="max-w-md text-center text-sm text-muted">
-                {L.demoPlaceholder}
-              </p>
-            </div>
-          </div>
-          <p className="mt-5 text-sm text-muted">{L.demoCaption}</p>
+          <HoverEffect
+            className="mt-8"
+            items={L.useCases.map((u, i) => ({
+              title: u.title,
+              description: u.body,
+              icon: [BookOpen, CreditCard, CircleHelp, Rocket][i],
+            }))}
+          />
         </section>
 
         <section id="pricing" className="mx-auto max-w-6xl px-5 py-24 sm:py-28">
-          <div className="mb-10 max-w-2xl">
+          <div className="mx-auto max-w-2xl text-center">
             <h2 className="display text-3xl font-bold sm:text-4xl">
               {L.pricingTitle}
             </h2>
             <p className="mt-3 text-muted">{L.pricingSubtitle}</p>
           </div>
-          <div className="grid items-stretch gap-5 lg:grid-cols-3">
+          <div className="mt-12 grid items-stretch gap-5 lg:grid-cols-3">
             {PLANS.map((plan) => {
               const copy = t.plans[plan.id];
+              const Icon = PLAN_ICONS[plan.id];
               return (
                 <article
                   key={plan.id}
-                  className={`flex h-full flex-col rounded-[1.75rem] border p-6 ${
+                  className={`relative flex h-full flex-col rounded-3xl border border-line bg-[var(--panel)] p-7 ${
                     plan.highlight
-                      ? "border-transparent shadow-[0_24px_60px_rgba(7,23,20,0.25)]"
-                      : "panel"
+                      ? "shadow-[0_20px_50px_rgba(7,23,20,0.12)] ring-1 ring-moss/30"
+                      : ""
                   }`}
-                  style={
-                    plan.highlight
-                      ? {
-                          background: "var(--chat-surface)",
-                          color: "var(--chat-fg)",
-                        }
-                      : undefined
-                  }
                 >
-                  <p className="text-sm opacity-80">{copy.name}</p>
-                  <p className="display mt-2 text-4xl font-extrabold">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="display text-xl font-bold">{copy.name}</p>
+                      <p className="mt-1 text-sm text-muted">{copy.blurb}</p>
+                    </div>
+                    <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-2xl bg-foam text-moss-deep">
+                      <Icon className="size-5" aria-hidden />
+                    </span>
+                  </div>
+
+                  <p className="display mt-6 text-4xl font-extrabold tracking-tight">
                     {plan.price}
-                    <span className="text-base font-medium opacity-70">
+                    <span className="text-base font-medium text-muted">
                       {copy.period ? ` ${copy.period}` : ""}
                     </span>
                   </p>
-                  <p
-                    className={`mt-3 text-sm ${plan.highlight ? "opacity-75" : "text-muted"}`}
+
+                  <Link
+                    href="/signup"
+                    className={`btn mt-6 w-full ${
+                      plan.highlight ? "btn-primary" : "btn-ghost"
+                    }`}
                   >
-                    {copy.blurb}
+                    {copy.cta}
+                  </Link>
+
+                  <p className="mt-8 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+                    {copy.name} {L.planIncludes}
                   </p>
-                  <ul className="mt-6 flex-1 space-y-2 text-sm">
+                  <ul className="mt-3 flex-1 space-y-2.5 text-sm">
                     {copy.features.map((f) => (
-                      <li key={f}>• {f}</li>
+                      <li key={f} className="flex gap-2.5">
+                        <Check
+                          className="mt-0.5 size-4 shrink-0 text-moss"
+                          strokeWidth={2.25}
+                          aria-hidden
+                        />
+                        <span>{f}</span>
+                      </li>
                     ))}
                   </ul>
-                  {plan.highlight ? (
-                    <div className="mt-8">
-                      <ShinyButton href="/signup" inverse>
-                        {copy.cta}
-                      </ShinyButton>
-                    </div>
-                  ) : (
-                    <Link href="/signup" className="btn btn-primary mt-8 w-full">
-                      {copy.cta}
-                    </Link>
-                  )}
                 </article>
               );
             })}
           </div>
-          <p className="mt-6 text-sm text-muted">
+          <p className="mt-8 text-center text-sm text-muted">
             {L.pricingNote}{" "}
             <a
               href="mailto:hello@replybase.app"

@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { corsOptions, withCors } from "@/lib/cors";
 import { getBotById, getProfileById } from "@/lib/db";
 import { canEmbed } from "@/lib/plans";
+import { resolveReplyLocale } from "@/lib/no-answer";
 import { answerWithContext, retrieveChunksForBot } from "@/lib/rag";
 
 type Ctx = { params: Promise<{ botId: string }> };
@@ -11,6 +12,7 @@ type Ctx = { params: Promise<{ botId: string }> };
 const schema = z.object({
   message: z.string().min(1).max(2000),
   publicKey: z.string().optional(),
+  locale: z.enum(["en", "ru"]).optional(),
 });
 
 export async function OPTIONS() {
@@ -58,22 +60,29 @@ export async function POST(req: Request, ctx: Ctx) {
       );
     }
 
+    const locale = resolveReplyLocale(
+      body.locale || req.headers.get("accept-language"),
+    );
     const retrieved = await retrieveChunksForBot(bot.id, body.message, 4);
     const result = await answerWithContext({
       question: body.message,
       contextChunks: retrieved,
       systemPrompt: bot.systemPrompt,
       botName: bot.name,
+      locale,
     });
 
     return withCors(
       NextResponse.json({
         answer: result.answer,
         mode: result.mode,
-        sources: retrieved.map((c) => ({
-          documentId: c.documentId,
-          excerpt: c.text.slice(0, 160),
-        })),
+        unanswered: result.unanswered,
+        sources: result.unanswered
+          ? []
+          : retrieved.map((c) => ({
+              documentId: c.documentId,
+              excerpt: c.text.slice(0, 160),
+            })),
       }),
     );
   } catch (e) {

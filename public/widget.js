@@ -41,28 +41,89 @@
     return node;
   }
 
+  function widgetLocale() {
+    const lang = (navigator.language || "ru").toLowerCase();
+    return lang.startsWith("en") ? "en" : "ru";
+  }
+
+  const copy = {
+    en: {
+      noAnswer:
+        "I can't answer that right now. Please rephrase your question or contact an operator.",
+      contactOperator: "Contact operator",
+      contactSubject: "Support request from website chat",
+      contactSent: "Request marked for the operator.",
+    },
+    ru: {
+      noAnswer:
+        "На этот ответ я не смогу вам сейчас ответить. Переформулируйте ваш вопрос или свяжитесь с оператором.",
+      contactOperator: "Связаться с оператором",
+      contactSubject: "Запрос в поддержку из чата на сайте",
+      contactSent: "Запрос передан оператору.",
+    },
+  };
+
   function renderMessages(list) {
     list.innerHTML = "";
-    state.messages.forEach((m) => {
-      list.appendChild(
-        el(
-          "div",
-          {
-            style: {
-              alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-              background: m.role === "user" ? "#0f766e" : "#f1f5f4",
-              color: m.role === "user" ? "#fff" : "#0b1f1c",
-              padding: "10px 12px",
-              borderRadius: "14px",
-              maxWidth: "90%",
-              fontSize: "14px",
-              lineHeight: "1.4",
-              whiteSpace: "pre-wrap",
-            },
-            text: m.text,
+    const L = copy[widgetLocale()];
+    state.messages.forEach((m, idx) => {
+      const wrap = el("div", {
+        style: {
+          alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+          display: "flex",
+          flexDirection: "column",
+          gap: "6px",
+          maxWidth: "90%",
+        },
+      });
+      wrap.appendChild(
+        el("div", {
+          style: {
+            background: m.role === "user" ? "#0f766e" : "#f1f5f4",
+            color: m.role === "user" ? "#fff" : "#0b1f1c",
+            padding: "10px 12px",
+            borderRadius: "14px",
+            fontSize: "14px",
+            lineHeight: "1.4",
+            whiteSpace: "pre-wrap",
           },
-        ),
+          text: m.text,
+        }),
       );
+      if (m.contactOperator) {
+        wrap.appendChild(
+          el("button", {
+            type: "button",
+            text: L.contactOperator,
+            style: {
+              alignSelf: "flex-start",
+              border: "1px solid #c5d6d1",
+              background: "#fff",
+              color: "#0f4f43",
+              borderRadius: "999px",
+              padding: "6px 12px",
+              fontSize: "12px",
+              fontWeight: "600",
+              cursor: "pointer",
+            },
+            onClick: () => {
+              let q = "";
+              for (let i = idx - 1; i >= 0; i -= 1) {
+                if (state.messages[i].role === "user") {
+                  q = state.messages[i].text;
+                  break;
+                }
+              }
+              const subject = encodeURIComponent(L.contactSubject);
+              const body = encodeURIComponent(q || m.text);
+              window.location.href = `mailto:?subject=${subject}&body=${body}`;
+              state.messages.push({ role: "assistant", text: L.contactSent });
+              renderMessages(list);
+            },
+          }),
+        );
+      }
+      list.appendChild(wrap);
     });
     list.scrollTop = list.scrollHeight;
   }
@@ -70,6 +131,8 @@
   async function send(input, list) {
     const text = input.value.trim();
     if (!text || state.loading) return;
+    const locale = widgetLocale();
+    const L = copy[locale];
     state.messages.push({ role: "user", text });
     input.value = "";
     renderMessages(list);
@@ -78,11 +141,16 @@
       const res = await fetch(`${origin}/api/bots/${botId}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, publicKey: key }),
+        body: JSON.stringify({ message: text, publicKey: key, locale }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      state.messages.push({ role: "assistant", text: data.answer });
+      const unanswered = !!data.unanswered;
+      state.messages.push({
+        role: "assistant",
+        text: unanswered ? L.noAnswer : data.answer,
+        contactOperator: unanswered,
+      });
     } catch (e) {
       state.messages.push({
         role: "assistant",

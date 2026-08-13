@@ -39,17 +39,28 @@ export type Dictionary = {
     trust1: string;
     trust2: string;
     trust3: string;
-    problemTitle: string;
-    problemBody: string;
+    problemEyebrow: string;
+    problemTitleLead: string;
+    problemTitleHighlightA: string;
+    problemTitleMid: string;
+    problemTitleHighlightB: string;
+    problemTitleTail: string;
+    problemSub: string;
+    problemImageAlt: string;
+    planIncludes: string;
     howTitle: string;
     steps: { title: string; body: string }[];
     featuresTitle: string;
+    featuresSubtitle: string;
+    featuresImageAlt: string;
+    featuresReadMore: string;
     features: { title: string; body: string }[];
+    modelsEyebrow: string;
+    modelsTitle: string;
+    modelsBody: string;
+    modelsFootnote: string;
     useCasesTitle: string;
     useCases: { title: string; body: string }[];
-    demoTitle: string;
-    demoCaption: string;
-    demoPlaceholder: string;
     pricingTitle: string;
     pricingSubtitle: string;
     pricingNote: string;
@@ -163,12 +174,17 @@ export type Dictionary = {
     uploading: string;
     fileReadFailed: string;
     fileTooShort: string;
+    fileTooLarge: string;
     uploadIndex: string;
     deleteDoc: string;
     noDocuments: string;
     chatTitle: string;
     chatPlaceholder: string;
     send: string;
+    noAnswer: string;
+    contactOperator: string;
+    contactOperatorSubject: string;
+    contactOperatorSent: string;
     embedTitle: string;
     embedHintLead: string;
     embedHintTrail: string;
@@ -216,16 +232,24 @@ const en: Dictionary = {
     subtitle:
       "Upload your help center, API docs, or product guides. Replybase answers questions inside your app and on your website — using only what you gave it, nothing invented.",
     ctaPrimary: "Start free — no credit card",
-    ctaSecondary: "Watch 2-min demo",
+    ctaSecondary: "See pricing",
     heroNote: "Free plan includes 1 bot, 3 documents, 50 replies/month.",
     trustLine:
       "Answers are grounded in your documents. If it's not in your docs, Replybase says so instead of guessing.",
     trust1: "Retrieval-based, not open-ended",
     trust2: "Sources shown with every answer",
     trust3: "No hallucinated pricing, policies, or steps",
-    problemTitle: "Support doesn't scale with headcount",
-    problemBody:
-      "Every new user asks the same questions your docs already answer. A generic AI chatbot either hallucinates answers or has no idea about your product. Replybase reads only what you upload — your help center, your policies, your product — and answers from that, in your app and on your site.",
+    problemEyebrow: "The old way",
+    problemTitleLead: "Now you",
+    problemTitleHighlightA: "don’t have to choose",
+    problemTitleMid: "between",
+    problemTitleHighlightB: "generic AI chatbots",
+    problemTitleTail: " and endless FAQ tickets.",
+    problemSub:
+      "We finally built a support agent that only answers from your docs.",
+    problemImageAlt:
+      "Desk with help docs and a laptop — the same support questions keep coming back",
+    planIncludes: "plan includes",
     howTitle: "From docs to deployed bot in under 10 minutes",
     steps: [
       {
@@ -246,6 +270,11 @@ const en: Dictionary = {
       },
     ],
     featuresTitle: "Built for teams who already have documentation",
+    featuresSubtitle:
+      "Grounded support infrastructure you can ship in days, not quarters",
+    featuresImageAlt:
+      "Documentation on screen with a chat widget answering from the knowledge base",
+    featuresReadMore: "Learn more",
     features: [
       {
         title: "Grounded answers, not guesses",
@@ -264,6 +293,11 @@ const en: Dictionary = {
         body: "Run a separate bot per product, plan tier, or language without duplicating setup.",
       },
     ],
+    modelsEyebrow: "Supported models",
+    modelsTitle: "Bring the model your team already trusts",
+    modelsBody:
+      "Retrieval and grounding work the same no matter which model answers. Choose OpenAI, Anthropic, or Google Gemini per bot — switch anytime, no re-indexing your docs.",
+    modelsFootnote: "+ Bring your own API key on the Growth plan",
     useCasesTitle: "Where teams put Replybase",
     useCases: [
       {
@@ -283,13 +317,9 @@ const en: Dictionary = {
         body: "New users get unstuck without waiting on support hours.",
       },
     ],
-    demoTitle: "See it answer real questions",
-    demoCaption:
-      "2 minutes: upload docs → ask questions → embed on a live page.",
-    demoPlaceholder: "Video demo placeholder — screen recording with voiceover",
-    pricingTitle: "Simple pricing, upgrade when you need the widget",
+    pricingTitle: "Pick a pricing that fits your needs",
     pricingSubtitle:
-      "Billing runs on Stripe test mode for this demo — plans below reflect real pricing logic.",
+      "Every plan starts free to try. Upgrade when you need the embed widget — Stripe test mode in this demo.",
     pricingNote: "Need more documents or replies?",
     contactUs: "Contact us",
     faqTitle: "FAQ",
@@ -447,22 +477,29 @@ const en: Dictionary = {
     upgradeForEmbed: "Upgrade for embed",
     documentsTitle: "Documents",
     documentsHint:
-      "Paste help center content or attach a .txt / .md file.",
+      "Paste help center content or attach .txt, .md, .pdf, or .docx.",
     docTitlePlaceholder: "e.g. API keys & rotation",
     docContentPlaceholder:
       "Paste article text here…\n\nTip: include headings and steps so answers stay grounded.",
     attachFile: "Attach file",
-    attachHint: ".txt, .md, .csv, .json",
+    attachHint: ".txt, .md, .csv, .json, .pdf, .docx",
     dropHint: "Drop file to attach",
     uploading: "Uploading…",
-    fileReadFailed: "Could not read that file. Use a text document.",
+    fileReadFailed:
+      "Could not read that file. Use txt, md, pdf, or docx.",
     fileTooShort: "File is too short (need at least 20 characters).",
+    fileTooLarge: "File is too large (max 4 MB).",
     uploadIndex: "Upload & index",
     deleteDoc: "Delete",
     noDocuments: "No documents yet.",
     chatTitle: "In-app chat",
     chatPlaceholder: "Ask from your docs…",
     send: "Send",
+    noAnswer:
+      "I can't answer that right now. Please rephrase your question or contact an operator.",
+    contactOperator: "Contact operator",
+    contactOperatorSubject: "Support request from Replybase chat",
+    contactOperatorSent: "Request marked for the operator.",
     embedTitle: "Embeddable widget",
     embedHintLead: "Paste this before",
     embedHintTrail: "on any site.",
@@ -511,16 +548,24 @@ const ru: Dictionary = {
     subtitle:
       "Загрузите help center, API-доки или продуктовые гайды. Replybase отвечает внутри приложения и на сайте — только по тому, что вы загрузили, без выдумок.",
     ctaPrimary: "Начать бесплатно — без карты",
-    ctaSecondary: "Смотреть демо 2 мин",
+    ctaSecondary: "Смотреть тарифы",
     heroNote: "Free: 1 бот, 3 документа, 50 ответов в месяц.",
     trustLine:
       "Ответы опираются на ваши документы. Если ответа нет в доках — Replybase так и скажет, а не будет угадывать.",
     trust1: "Retrieval, не open-ended чат",
     trust2: "Источники рядом с каждым ответом",
     trust3: "Без выдуманных цен, политик и шагов",
-    problemTitle: "Поддержка не масштабируется наймом",
-    problemBody:
-      "Каждый новый пользователь задаёт те же вопросы, на которые уже отвечают ваши доки. Обычный AI-чатбот либо галлюцинирует, либо не знает продукт. Replybase читает только загруженное — help center, политики, продукт — и отвечает из этого в приложении и на сайте.",
+    problemEyebrow: "The old way",
+    problemTitleLead: "Теперь",
+    problemTitleHighlightA: "не нужно выбирать",
+    problemTitleMid: "между",
+    problemTitleHighlightB: "обычными AI-чатботами",
+    problemTitleTail: " и бесконечными FAQ-тикетами.",
+    problemSub:
+      "Мы сделали агента поддержки, который отвечает только по вашим документам.",
+    problemImageAlt:
+      "Стол с документацией и ноутбуком — одни и те же вопросы поддержки возвращаются снова",
+    planIncludes: "включает",
     howTitle: "От документов до бота на сайте меньше чем за 10 минут",
     steps: [
       {
@@ -541,6 +586,11 @@ const ru: Dictionary = {
       },
     ],
     featuresTitle: "Для команд, у которых уже есть документация",
+    featuresSubtitle:
+      "Инфраструктура grounded-поддержки, которую можно запустить за дни, а не кварталы",
+    featuresImageAlt:
+      "Документация на экране и чат-виджет, отвечающий по базе знаний",
+    featuresReadMore: "Подробнее",
     features: [
       {
         title: "Grounded-ответы, не догадки",
@@ -559,6 +609,11 @@ const ru: Dictionary = {
         body: "Отдельный бот на продукт, тариф или язык — без дублирования настройки.",
       },
     ],
+    modelsEyebrow: "Supported models",
+    modelsTitle: "Подключайте модель, которой уже доверяет команда",
+    modelsBody:
+      "Retrieval и grounding работают одинаково, какой бы моделью ни отвечали. OpenAI, Anthropic или Google Gemini — на бота, смена в любой момент без переиндексации документов.",
+    modelsFootnote: "+ Свой API-ключ на тарифе Growth",
     useCasesTitle: "Куда команды ставят Replybase",
     useCases: [
       {
@@ -578,13 +633,9 @@ const ru: Dictionary = {
         body: "Новые пользователи не ждут часов работы поддержки.",
       },
     ],
-    demoTitle: "Как он отвечает на реальные вопросы",
-    demoCaption:
-      "2 минуты: загрузить доки → задать вопросы → встроить на живую страницу.",
-    demoPlaceholder: "Плейсхолдер видео — скринкаст с голосом",
-    pricingTitle: "Простые тарифы — апгрейд, когда нужен виджет",
+    pricingTitle: "Выберите тариф под свои задачи",
     pricingSubtitle:
-      "Биллинг в демо на Stripe test mode — тарифы ниже отражают реальную логику цен.",
+      "Старт бесплатный. Апгрейд, когда нужен embed — в демо биллинг на Stripe test mode.",
     pricingNote: "Нужно больше документов или ответов?",
     contactUs: "Написать нам",
     faqTitle: "FAQ",
@@ -743,22 +794,29 @@ const ru: Dictionary = {
     upgradeForEmbed: "Апгрейд для embed",
     documentsTitle: "Документы",
     documentsHint:
-      "Вставьте текст help center или прикрепите .txt / .md файл.",
+      "Вставьте текст help center или прикрепите .txt, .md, .pdf или .docx.",
     docTitlePlaceholder: "напр. API-ключи и ротация",
     docContentPlaceholder:
       "Вставьте текст статьи сюда…\n\nСовет: оставляйте заголовки и шаги — ответы будут точнее.",
     attachFile: "Прикрепить файл",
-    attachHint: ".txt, .md, .csv, .json",
+    attachHint: ".txt, .md, .csv, .json, .pdf, .docx",
     dropHint: "Отпустите файл, чтобы прикрепить",
     uploading: "Загружаем…",
-    fileReadFailed: "Не удалось прочитать файл. Нужен текстовый документ.",
+    fileReadFailed:
+      "Не удалось прочитать файл. Нужен txt, md, pdf или docx.",
     fileTooShort: "Файл слишком короткий (нужно минимум 20 символов).",
+    fileTooLarge: "Файл слишком большой (макс. 4 МБ).",
     uploadIndex: "Загрузить и проиндексировать",
     deleteDoc: "Удалить",
     noDocuments: "Документов пока нет.",
     chatTitle: "Чат в приложении",
     chatPlaceholder: "Спросите по вашим документам…",
     send: "Отправить",
+    noAnswer:
+      "На этот ответ я не смогу вам сейчас ответить. Переформулируйте ваш вопрос или свяжитесь с оператором.",
+    contactOperator: "Связаться с оператором",
+    contactOperatorSubject: "Запрос в поддержку из чата Replybase",
+    contactOperatorSent: "Запрос передан оператору.",
     embedTitle: "Встраиваемый виджет",
     embedHintLead: "Вставьте это перед",
     embedHintTrail: "на любом сайте.",

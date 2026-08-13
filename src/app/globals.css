@@ -313,3 +313,28 @@ button.btn-shiny > .btn-shiny-label {
 .nav-link:hover::after {
   transform: scaleX(1);
 }
+
+@keyframes models-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+.models-marquee {
+  animation: models-marquee 22s linear infinite;
+}
+
+@media (max-width: 1023px) {
+  .models-marquee {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .models-marquee {
+    animation: none;
+  }
+}

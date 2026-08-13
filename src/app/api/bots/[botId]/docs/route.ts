@@ -6,15 +6,65 @@ import {
   createDocumentWithChunks,
   getBotForUser,
 } from "@/lib/db";
+import {
+  extractDocumentText,
+  isSupportedDocFilename,
+  titleFromFilename,
+} from "@/lib/extract-document";
 import { planLimits } from "@/lib/plans";
 import { buildChunks } from "@/lib/rag";
 
 type Ctx = { params: Promise<{ botId: string }> };
 
-const schema = z.object({
+const MAX_BYTES = 4 * 1024 * 1024; // Vercel request body ~4.5MB
+
+const jsonSchema = z.object({
   title: z.string().min(1).max(120),
   content: z.string().min(20).max(80_000),
 });
+
+async function parseUpload(req: Request): Promise<{
+  title: string;
+  content: string;
+}> {
+  const contentType = req.headers.get("content-type") || "";
+
+  if (contentType.includes("multipart/form-data")) {
+    const form = await req.formData();
+    const file = form.get("file");
+    if (!(file instanceof File)) {
+      throw new Error("Missing file");
+    }
+    if (file.size > MAX_BYTES) {
+      throw new Error("File is too large (max 4 MB).");
+    }
+    if (!isSupportedDocFilename(file.name)) {
+      throw new Error(
+        "Unsupported file type. Use txt, md, csv, json, pdf, or docx.",
+      );
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const extracted = await extractDocumentText({
+      buffer,
+      filename: file.name,
+      mimeType: file.type,
+    });
+    if (extracted.length < 20) {
+      throw new Error("Extracted text is too short (need at least 20 characters).");
+    }
+    if (extracted.length > 80_000) {
+      throw new Error("Document text is too long (max 80,000 characters).");
+    }
+
+    const titleField = String(form.get("title") || "").trim();
+    const title = (titleField || titleFromFilename(file.name)).slice(0, 120);
+    return { title, content: extracted };
+  }
+
+  const body = jsonSchema.parse(await req.json());
+  return body;
+}
 
 export async function POST(req: Request, ctx: Ctx) {
   const user = await getCurrentUser();
@@ -22,7 +72,7 @@ export async function POST(req: Request, ctx: Ctx) {
   const { botId } = await ctx.params;
 
   try {
-    const body = schema.parse(await req.json());
+    const { title, content } = await parseUpload(req);
     const bot = await getBotForUser(botId, user.id);
     if (!bot) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -39,13 +89,13 @@ export async function POST(req: Request, ctx: Ctx) {
 
     const { document, chunkCount } = await createDocumentWithChunks({
       botId,
-      title: body.title,
-      content: body.content,
+      title,
+      content,
       buildChunks: (documentId) =>
         buildChunks({
           botId,
           documentId,
-          content: body.content,
+          content,
         }),
     });
 
@@ -58,6 +108,12 @@ export async function POST(req: Request, ctx: Ctx) {
       },
     });
   } catch (e) {
+    if (e instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: e.issues[0]?.message || "Invalid document" },
+        { status: 400 },
+      );
+    }
     const message = e instanceof Error ? e.message : "Upload failed";
     return NextResponse.json({ error: message }, { status: 400 });
   }

@@ -1,6 +1,11 @@
 import OpenAI from "openai";
 import { nanoid } from "nanoid";
 import { listChunksForBot, matchChunksByEmbedding } from "./db";
+import {
+  NO_ANSWER_MESSAGE,
+  NO_ANSWER_SENTINEL,
+  type ReplyLocale,
+} from "./no-answer";
 import type { Chunk } from "./types";
 
 const CHUNK_SIZE = 700;
@@ -158,13 +163,25 @@ export async function answerWithContext(input: {
   contextChunks: Chunk[];
   systemPrompt: string;
   botName: string;
-}): Promise<{ answer: string; mode: "openai" | "extractive" }> {
+  locale?: ReplyLocale;
+}): Promise<{
+  answer: string;
+  mode: "openai" | "extractive";
+  unanswered: boolean;
+}> {
+  const locale = input.locale || "ru";
+  const noAnswer = NO_ANSWER_MESSAGE[locale];
+
+  if (!input.contextChunks.length) {
+    return { answer: noAnswer, mode: "extractive", unanswered: true };
+  }
+
   const context = input.contextChunks
     .map((c, i) => `[${i + 1}] ${c.text}`)
     .join("\n\n");
 
   const client = getOpenAI();
-  if (client && context) {
+  if (client) {
     try {
       const completion = await client.chat.completions.create({
         model: chatModel(),
@@ -176,8 +193,8 @@ export async function answerWithContext(input: {
 
 You are ${input.botName}, a product support assistant.
 Answer ONLY using the provided context.
-If the answer is not in the context, say you don't have that information yet and suggest contacting the team.
-Keep answers concise and practical.`,
+If the answer is not clearly supported by the context, reply with exactly ${NO_ANSWER_SENTINEL} and nothing else.
+Do not invent facts. Keep answers concise and practical.`,
           },
           {
             role: "user",
@@ -185,21 +202,19 @@ Keep answers concise and practical.`,
           },
         ],
       });
-      const answer =
-        completion.choices[0]?.message?.content?.trim() ||
-        "I couldn't generate an answer.";
-      return { answer, mode: "openai" };
+      const raw =
+        completion.choices[0]?.message?.content?.trim() || NO_ANSWER_SENTINEL;
+      if (
+        raw === NO_ANSWER_SENTINEL ||
+        raw.includes(NO_ANSWER_SENTINEL) ||
+        /^i (don't|do not) (have|know)/i.test(raw)
+      ) {
+        return { answer: noAnswer, mode: "openai", unanswered: true };
+      }
+      return { answer: raw, mode: "openai", unanswered: false };
     } catch {
       // fall through
     }
-  }
-
-  if (!context) {
-    return {
-      answer:
-        "I don't have any documents yet. Upload help docs in the dashboard, then ask again.",
-      mode: "extractive",
-    };
   }
 
   return {
@@ -208,5 +223,6 @@ Keep answers concise and practical.`,
       .map((c) => c.text)
       .join("\n\n---\n\n")}\n\n(Demo mode: add OPENROUTER_API_KEY or OPENAI_API_KEY for full LLM answers.)`,
     mode: "extractive",
+    unanswered: false,
   };
 }
