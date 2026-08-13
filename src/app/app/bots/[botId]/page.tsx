@@ -183,6 +183,9 @@ export default function BotDetailPage() {
   );
   const [openingDocId, setOpeningDocId] = useState<string | null>(null);
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
+  const leftColRef = useRef<HTMLDivElement>(null);
+  const chatShellRef = useRef<HTMLDivElement>(null);
+  const [chatHeight, setChatHeight] = useState<number | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState("");
@@ -458,6 +461,36 @@ export default function BotDetailPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [preview, editOpen, renameBusy, deleteBusy]);
 
+  // Fit chat fully in viewport (incl. Send) and never taller than the left column
+  useLayoutEffect(() => {
+    if (!bot) return;
+
+    function updateChatHeight() {
+      const shell = chatShellRef.current;
+      const left = leftColRef.current;
+      if (!shell) return;
+
+      const top = shell.getBoundingClientRect().top;
+      const bottomPad = 24;
+      const viewportFit = window.innerHeight - top - bottomPad;
+      const leftH = left?.getBoundingClientRect().height ?? viewportFit;
+      const next = Math.floor(Math.max(320, Math.min(viewportFit, leftH)));
+      setChatHeight((prev) => (prev === next ? prev : next));
+    }
+
+    updateChatHeight();
+    window.addEventListener("scroll", updateChatHeight, { passive: true });
+    window.addEventListener("resize", updateChatHeight);
+    const ro = new ResizeObserver(updateChatHeight);
+    if (leftColRef.current) ro.observe(leftColRef.current);
+
+    return () => {
+      window.removeEventListener("scroll", updateChatHeight);
+      window.removeEventListener("resize", updateChatHeight);
+      ro.disconnect();
+    };
+  }, [bot]);
+
   function openEdit() {
     if (!bot) return;
     setEditName(bot.name);
@@ -597,7 +630,7 @@ export default function BotDetailPage() {
       {error ? <p className="shrink-0 text-sm text-accent">{error}</p> : null}
 
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <div className="flex flex-col gap-6">
+        <div ref={leftColRef} className="flex flex-col gap-6">
           <section className="panel shrink-0 rounded-3xl p-5">
             <h2 className="display text-xl font-bold">
               {t.app.instructionsTitle}
@@ -787,8 +820,17 @@ export default function BotDetailPage() {
           </section>
         </div>
 
-        <div className="flex flex-col lg:sticky lg:top-24 lg:self-start">
-          <section className="panel flex h-[min(520px,calc(100svh-8rem))] flex-col rounded-3xl p-5 lg:h-[calc(100svh-8rem)] lg:max-h-[calc(100svh-8rem)]">
+        <div
+          ref={chatShellRef}
+          className="flex flex-col lg:sticky lg:top-24 lg:self-start"
+        >
+          <section
+            className="panel flex flex-col rounded-3xl p-5"
+            style={{
+              height: chatHeight ?? "min(520px, calc(100svh - 8rem))",
+              maxHeight: chatHeight ?? "min(520px, calc(100svh - 8rem))",
+            }}
+          >
             <h2 className="display shrink-0 text-xl font-bold">
               {t.app.chatTitle}
             </h2>
