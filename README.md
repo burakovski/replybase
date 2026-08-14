@@ -42,7 +42,22 @@ Apply schema once (SQL Editor or CLI):
 
 `supabase/migrations/20260811120000_init.sql`
 
-In Supabase Auth settings, disable email confirm for local demo (or confirm via inbox).
+### Auth: email confirmation code
+
+Signup sends a confirmation code; the user enters it on `/signup` before getting a session.
+
+In Supabase Dashboard → **Authentication**:
+
+1. **Providers → Email** — enable **Confirm email**
+2. **Email Templates → Confirm signup** — include the OTP in the body, e.g.:
+
+```html
+<h2>Confirm your signup</h2>
+<p>Your Replybase code is: <strong>{{ .Token }}</strong></p>
+<p>Or open this link: <a href="{{ .ConfirmationURL }}">Confirm email</a></p>
+```
+
+Without `{{ .Token }}` the UI code step will not work (link-only emails).
 
 ## What to demo
 

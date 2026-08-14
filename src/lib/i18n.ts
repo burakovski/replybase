@@ -124,6 +124,19 @@ export type Dictionary = {
     logInLink: string;
     loginFailed: string;
     signupFailed: string;
+    confirmTitle: string;
+    confirmHint: string;
+    codeLabel: string;
+    codePlaceholder: string;
+    verifying: string;
+    verify: string;
+    resendCode: string;
+    resending: string;
+    resent: string;
+    resendIn: string;
+    verifyFailed: string;
+    emailNotConfirmed: string;
+    changeEmail: string;
   };
   app: {
     botsTitle: string;
@@ -457,6 +470,19 @@ const en: Dictionary = {
     logInLink: "Log in",
     loginFailed: "Login failed",
     signupFailed: "Signup failed",
+    confirmTitle: "Enter confirmation code",
+    confirmHint: "We sent a code to {email}. Enter it to finish signup.",
+    codeLabel: "Confirmation code",
+    codePlaceholder: "6-digit code",
+    verifying: "Verifying…",
+    verify: "Confirm",
+    resendCode: "Resend code",
+    resending: "Sending…",
+    resent: "Code sent again",
+    resendIn: "Resend in {s}s",
+    verifyFailed: "Incorrect code",
+    emailNotConfirmed: "Confirm your email with the code we sent you.",
+    changeEmail: "Use a different email",
   },
   app: {
     botsTitle: "Your chatbots",
@@ -802,6 +828,19 @@ const ru: Dictionary = {
     logInLink: "Войти",
     loginFailed: "Не удалось войти",
     signupFailed: "Не удалось зарегистрироваться",
+    confirmTitle: "Введите код подтверждения",
+    confirmHint: "Мы отправили код на {email}. Введите его, чтобы завершить регистрацию.",
+    codeLabel: "Код подтверждения",
+    codePlaceholder: "6 цифр",
+    verifying: "Проверяем…",
+    verify: "Подтвердить",
+    resendCode: "Отправить код ещё раз",
+    resending: "Отправляем…",
+    resent: "Код отправлен снова",
+    resendIn: "Повтор через {s} с",
+    verifyFailed: "Неверный код",
+    emailNotConfirmed: "Подтвердите почту кодом из письма.",
+    changeEmail: "Указать другой email",
   },
   app: {
     botsTitle: "Ваши чат-боты",

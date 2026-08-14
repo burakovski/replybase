@@ -290,7 +290,7 @@ export function LandingPage({ signedIn }: { signedIn: boolean }) {
             {L.pricingNote}{" "}
             <a
               href="mailto:hello@replybase.app"
-              className="font-semibold text-ink"
+              className="font-semibold text-ink underline"
             >
               {L.contactUs}
             </a>

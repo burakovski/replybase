@@ -11,23 +11,33 @@ export default function LoginPage() {
   const { t } = useLocale();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
+    setPendingEmail("");
     setLoading(true);
     const form = new FormData(e.currentTarget);
+    const email = String(form.get("email") || "")
+      .trim()
+      .toLowerCase();
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: form.get("email"),
+        email,
         password: form.get("password"),
       }),
     });
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
+      if (data.code === "email_not_confirmed") {
+        setPendingEmail(email);
+        setError(t.auth.emailNotConfirmed);
+        return;
+      }
       setError(data.error || t.auth.loginFailed);
       return;
     }
@@ -61,12 +71,22 @@ export default function LoginPage() {
             />
           </div>
           {error ? <p className="mt-3 text-sm text-accent">{error}</p> : null}
+          {pendingEmail ? (
+            <p className="mt-2 text-sm text-muted">
+              <Link
+                href={`/signup?verify=1&email=${encodeURIComponent(pendingEmail)}`}
+                className="font-semibold text-ink underline"
+              >
+                {t.auth.confirmTitle}
+              </Link>
+            </p>
+          ) : null}
           <button className="btn btn-primary mt-6 w-full" disabled={loading}>
             {loading ? t.auth.signingIn : t.auth.logIn}
           </button>
           <p className="mt-4 text-center text-sm text-muted">
             {t.auth.newHere}{" "}
-            <Link href="/signup" className="font-semibold text-ink">
+            <Link href="/signup" className="font-semibold text-ink underline">
               {t.auth.createAccountLink}
             </Link>
           </p>

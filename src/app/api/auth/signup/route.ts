@@ -11,12 +11,20 @@ const schema = z.object({
 export async function POST(req: Request) {
   try {
     const body = schema.parse(await req.json());
-    const user = await signUpUser({
+    const result = await signUpUser({
       email: body.email,
       password: body.password,
       name: body.name || body.email.split("@")[0] || "User",
     });
-    return NextResponse.json({ user: publicUser(user) });
+
+    if (result.status === "needs_confirmation") {
+      return NextResponse.json({
+        needsConfirmation: true,
+        email: result.email,
+      });
+    }
+
+    return NextResponse.json({ user: publicUser(result.user) });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Signup failed";
     return NextResponse.json({ error: message }, { status: 400 });
